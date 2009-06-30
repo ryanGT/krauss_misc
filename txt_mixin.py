@@ -1,19 +1,19 @@
 import os, re
-import pytexutils
+import basic_file_ops
 
 class txt_file(object):
     def readfile(self, pathin, strip=False, rstrip=True):
-        return pytexutils.readfile(pathin, strip=strip, rstrip=rstrip)
+        return basic_file_ops.readfile(pathin, strip=strip, rstrip=rstrip)
 
 
     def writefile(self, pathin, listin=None, append=False):
         if listin is None:
             listin = self.list
-        return pytexutils.writefile(pathin, listin, append=append)
+        return basic_file_ops.writefile(pathin, listin, append=append)
 
 
     def save(self, pathout, append=False):
-        return pytexutils.writefile(pathout, self.list, append=append)
+        return basic_file_ops.writefile(pathout, self.list, append=append)
 
 
 class txt_list(list):
