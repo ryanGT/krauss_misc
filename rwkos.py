@@ -57,6 +57,7 @@ def makerel(fullpath):
     """Make sure that a path is relative and not full so that it is
     compatible with FindFullPath and can be used in a cross-platform
     way."""
+    user_name = os.getlogin()
     if amiLinux():
         fullpath=fullpath.replace('\\','/')
     else:
@@ -64,11 +65,11 @@ def makerel(fullpath):
     mylist = splittolist(fullpath)
     if mylist[0].upper()=='E:' or mylist[0].upper()=='E:\\':
         mylist = mylist[1:]
-    elif (mylist[0].upper()=='C:' or mylist[0].upper()=='C:\\') and mylist[1].lower()==os.getlogin():
+    elif (mylist[0].upper()=='C:' or mylist[0].upper()=='C:\\') and mylist[1].lower()==user_name:
         mylist = mylist[2:]
-    elif mylist[0]=='home' and mylist[1]==os.getlogin():
+    elif mylist[0]=='home' and mylist[1]==user_name:
         mylist = mylist[2:]
-    elif mylist[0:3]==['/','home',os.getlogin()] or mylist[0:3]==['\\','home',os.getlogin()]:
+    elif mylist[0:3]==['/','home',user_name] or mylist[0:3]==['\\','home',user_name]:
         mylist = mylist[3:]
     elif mylist[0]=='mnt':
         mylist = mylist[1:]
