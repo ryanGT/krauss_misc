@@ -64,11 +64,11 @@ def makerel(fullpath):
     mylist = splittolist(fullpath)
     if mylist[0].upper()=='E:' or mylist[0].upper()=='E:\\':
         mylist = mylist[1:]
-    elif (mylist[0].upper()=='C:' or mylist[0].upper()=='C:\\') and mylist[1].lower()=='ryan':
+    elif (mylist[0].upper()=='C:' or mylist[0].upper()=='C:\\') and mylist[1].lower()==os.getlogin():
         mylist = mylist[2:]
-    elif mylist[0]=='home' and mylist[1]=='ryan':
+    elif mylist[0]=='home' and mylist[1]==os.getlogin():
         mylist = mylist[2:]
-    elif mylist[0:3]==['/','home','ryan'] or mylist[0:3]==['\\','home','ryan']:
+    elif mylist[0:3]==['/','home',os.getlogin()] or mylist[0:3]==['\\','home',os.getlogin()]:
         mylist = mylist[3:]
     elif mylist[0]=='mnt':
         mylist = mylist[1:]
@@ -100,19 +100,16 @@ def FindFullPath(relpath, basepaths=['D:\\','C:\\ryan']):
         myname = socket.gethostname()
         if myname == 'ryan-duo-laptop':
             basepaths.extend(['/mnt/RYANFAT/'])
-        print('basepaths='+str(basepaths))
     relpath = makerel(relpath)
     folder, filename = os.path.split(relpath)
     if not folder:
         curdir = os.getcwd()
         checkpath = os.path.join(curdir, filename)
         if os.path.exists(checkpath):
-            print('checkpath='+checkpath)
             return checkpath
     curdir = os.getcwd()
     if os.path.exists(relpath):
         outpath = os.path.abspath(relpath)
-        print('outpath='+outpath)
         return outpath
     basepaths.insert(0, curdir)
     basepaths += sys.path
@@ -127,10 +124,8 @@ def FindFullPath(relpath, basepaths=['D:\\','C:\\ryan']):
             folder, filename = os.path.split(curpath)
             mypath = checklower(curpath, folder)
             if mypath:
-                print('mypath='+mypath)
                 return mypath
-    print('at bottom')
-    print('outpath='+outpath)
+    print('fullpath='+outpath)
     return outpath
 
 def FindinPath(filename):
