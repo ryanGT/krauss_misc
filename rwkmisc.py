@@ -9,6 +9,10 @@ import os, glob, re
 
 import cPickle
 
+def get_date_str():
+    date_str = time.strftime('%m_%d_%y')
+    return date_str
+
 def RegExpPop(listin, pat, returnq=False, multiline=False):
     if multiline:
         mystr = '\n'.join(listin)
