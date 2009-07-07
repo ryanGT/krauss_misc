@@ -236,7 +236,8 @@ def FindInSubDirs(topdir, pat, skipdirs=[]):
 
 
 def Find_in_top_and_sub_dirs(topdir, pat, skipdirs=[]):
-    topfiles = glob.glob(pat)
+    toppat = os.path.join(topdir, pat)
+    topfiles = glob.glob(toppat)
     subfiles = FindInSubDirs(topdir, pat, skipdirs=skipdirs)
     keeptops = [item for item in topfiles if item not in subfiles]
     return keeptops + subfiles
