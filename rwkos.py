@@ -3,6 +3,15 @@ import pdb
 import shutil
 #from  IPython.Debugger import Pdb
 
+def split_list_of_paths(pathlist):
+    names = []
+    folders = []
+    for item in pathlist:
+        curfolder, curname = os.path.split(item)
+        names.append(curname)
+        folders.append(curfolder)
+    return folders, names
+
 def clean_filename(pathin):
     """Remove all non-alphanumeric characters (including spaces) from
     pathin, replacing with an underscore (also replaces multiple
