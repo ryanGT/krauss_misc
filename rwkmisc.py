@@ -2,7 +2,7 @@
 
 import scipy, copy
 import time
-import os, glob, re
+import os, glob, re, sys
 
 #from  IPython.Debugger import Pdb
 #mytrace=Pdb().set_trace
@@ -350,8 +350,12 @@ def searchlist(listin, str2find, exact=False, casesense=False):
     return indout
 
 def my_import(name):
-    mod = __import__(name)
-    components = name.split('.')
+    folder, modname = os.path.split(name)
+    if folder:
+        if folder not in sys.path:
+            sys.path.append(folder)
+    mod = __import__(modname)
+    components = modname.split('.')
     for comp in components[1:]:
         mod = getattr(mod, comp)
     return mod
