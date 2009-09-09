@@ -3,6 +3,14 @@ import pdb
 import shutil
 #from  IPython.Debugger import Pdb
 
+def get_home():
+    """Get the users home directory on either windows or linux."""
+    home_dir = os.getenv('HOME') or os.getenv('USERPROFILE')
+    if not amiLinux():
+        home_dir = home_dir.replace('/','\\')#just making sure there
+                                             #are no '/'
+    return home_dir
+    
 def split_list_of_paths(pathlist):
     names = []
     folders = []
@@ -66,19 +74,32 @@ def makerel(fullpath):
     """Make sure that a path is relative and not full so that it is
     compatible with FindFullPath and can be used in a cross-platform
     way."""
-    user_name = os.getlogin()
+    #user_name = os.getlogin()#apparently, this doesn't work in windows
+    myhome = get_home()
     if amiLinux():
-        fullpath=fullpath.replace('\\','/')
+        user_name = os.getlogin()
+        fullpath = fullpath.replace('\\','/')
     else:
-        fullpath=fullpath.replace('/','\\')
-    mylist = splittolist(fullpath)
-    if mylist[0].upper()=='E:' or mylist[0].upper()=='E:\\':
+        fullpath = fullpath.replace('/','\\')
+        user_name = os.getenv('USERNAME')
+
+    if fullpath.find(myhome) == 0:
+        outpath = fullpath.replace(myhome, '')
+        if outpath[0] == os.path.sep:
+            outpath = outpath[1:]
+    else:
+        outpath = fullpath
+    mylist = splittolist(outpath)
+    windows_roots = ['E:','D:','C:','E:\\','D:\\','C:\\']
+    if mylist[0].upper() in windows_roots:
         mylist = mylist[1:]
     elif (mylist[0].upper()=='C:' or mylist[0].upper()=='C:\\') and mylist[1].lower()==user_name:
         mylist = mylist[2:]
     elif mylist[0]=='home' and mylist[1]==user_name:
         mylist = mylist[2:]
-    elif mylist[0:3]==['/','home',user_name] or mylist[0:3]==['\\','home',user_name]:
+    elif mylist[0:2]==['/','home'] or mylist[0:2]==['\\','home']:
+        #assume the if the path started with /home, then the third
+        #entry is user_name
         mylist = mylist[3:]
     elif mylist[0]=='mnt':
         mylist = mylist[1:]
@@ -102,7 +123,7 @@ def checklower(pathin, folder=None):
 
 def FindFullPath(relpath, basepaths=['D:\\','C:\\ryan']):
     outpath=''
-    print('relpath='+str(relpath))
+    #print('relpath='+str(relpath))
     if amiLinux():
         homedir = os.path.expanduser('~')
         basepaths = [homedir]
@@ -135,7 +156,7 @@ def FindFullPath(relpath, basepaths=['D:\\','C:\\ryan']):
             mypath = checklower(curpath, folder)
             if mypath:
                 return mypath
-    print('fullpath='+outpath)
+    #print('fullpath='+outpath)
     return outpath
 
 def FindinPath(filename):
