@@ -152,11 +152,13 @@ def plot_vect(ax, t, vect, clear=False, **kwargs):
 
 
 
-def set_Bode_opts(fig, bodeopts):
+def set_Bode_opts(fig, bodeopts, coh=True):
     """set the options of a Bode plot by looking for keys in bodeopts.
        Valid keys include freqlim, maglim, phaselim, and cohlim."""
     mydict={'freqlim':SetAllXlims, 'maglim':SetMagLim, \
-            'phaselim':SetPhaseLim, 'cohlim':SetCohLim}
+            'phaselim':SetPhaseLim}
+    if coh:
+        mydict.update({'cohlim':SetCohLim})
     defaults={'cohlim':[0,1]}
 
     for attr, func in mydict.iteritems():

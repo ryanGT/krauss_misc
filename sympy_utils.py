@@ -2,7 +2,7 @@ from scipy import *
 import sympy
 import copy
 from IPython.Debugger import Pdb
-
+import pdb
 
 def find_highest_power(nested_list):
     hp = 0
@@ -136,3 +136,35 @@ def diag(i, j):
 
 def eye(N):
     return sympy.Matrix(N, N, diag)
+
+
+class equation(object):
+    def __init__(self, lhs, rhs):
+        self.lhs = lhs
+        self.rhs = rhs
+
+    def __repr__(self):
+        return self.lhs.__repr__() + ' = ' + self.rhs.__repr__()
+
+    def __add__(self, other):
+        new_eq = equation(self.lhs+other, self.rhs+other)
+        return new_eq
+
+    def __radd__(self, other):
+        return self.__add__(other)
+
+    def __mul__(self, other):
+        new_eq = equation(self.lhs*other, self.rhs*other)
+        return new_eq
+
+    def expand(self):
+        new_lhs = sympy.expand(self.lhs)
+        new_rhs = sympy.expand(self.rhs)
+        new_eq = equation(new_lhs, new_rhs)
+        return new_eq
+    
+    def ToLatex(self, *args, **kwargs):
+        profile = {'mode':'plain'}
+        lhsstr = sympy.latex(self.lhs, profile)
+        rhsstr = sympy.latex(self.rhs, profile)
+        return lhsstr + ' = ' + rhsstr

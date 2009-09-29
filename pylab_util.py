@@ -32,14 +32,17 @@ def plot_cols(t, mat, fi=1, clear=True, leg=None, ylabel=None, \
     PL.figure(fi)
     if clear:
         PL.clf()
-    for col in mat.T:
-        PL.plot(t, col, **kwargs)
+    nr, nc = mat.shape
+    if leg is None:
+        leg = [None]*nc
+    for col, label in zip(mat.T, leg):
+        PL.plot(t, col, label=label, **kwargs)
     if ylabel:
         PL.ylabel(ylabel)
     if xlabel:
         PL.xlabel(xlabel)
     if leg:
-        PL.legend(leg, loc=legloc)
+        PL.legend(loc=legloc)
     if ylim:
         PL.ylim(ylim)
     if xlim:
@@ -79,7 +82,9 @@ def SetAllXlims(fi, xlim):
     fig = _get_fig(fi)
     mplutil.SetAllXlims(fig, xlim)
     
-
+def SetFreqLim(fi, xlim):
+    SetAllXlims(fi, xlim)
+    
 ## def SetMagLim(fi, maglim, axis=None):
 ##     fig = _get_fig(fi)
 ##     mplutil.SetMagLim(fig, maglim, axis)
