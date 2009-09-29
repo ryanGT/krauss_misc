@@ -35,7 +35,7 @@ def plot_cols(t, mat, fi=1, clear=True, leg=None, ylabel=None, \
     nr, nc = mat.shape
     if leg is None:
         leg = [None]*nc
-    for col, label in zip( mat.T, leg):
+    for col, label in zip(mat.T, leg):
         PL.plot(t, col, label=label, **kwargs)
     if ylabel:
         PL.ylabel(ylabel)

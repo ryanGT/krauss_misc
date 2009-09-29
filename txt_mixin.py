@@ -201,3 +201,8 @@ def dump(filename, listin):
     myfile = txt_file()
     myfile.writefile(filename, listin)
 
+
+def read(filename):
+    myfile = txt_file()
+    out = myfile.readfile(filename)
+    return out
