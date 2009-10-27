@@ -156,7 +156,12 @@ class txt_list(list):
 
 default_map = ['findall', 'findallre', 'findprevious', \
                'findnext', 'replaceall', 'findnextblank', \
-               'replaceallre', 'append','extend']
+               'replaceallre', 'append','extend', \
+               '__delitem__','__len__','__delattr__', \
+               '__delslice__','__getitem__','__setattr__', \
+               '__getslice__','__setitem__','__setslice__']
+
+
 
 class txt_file_with_list(txt_file):
     """This class represents a text file that is read into self.list."""
