@@ -25,7 +25,8 @@ def str_to_poly(strin):
 
 
 def mat_to_str(M, profile=None, **kwargs):
-    mydefaults = {"inline" : None,
+    mydefaults = {"mode": 'plain', \
+                  #"inline" : None,
                   "mat_str" : "bmatrix",
                   "mat_delim" : None,
                   "descending" : True,

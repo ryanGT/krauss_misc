@@ -13,6 +13,25 @@ def get_date_str():
     date_str = time.strftime('%m_%d_%y')
     return date_str
 
+def clean_list(listin):
+    """Remove blank entries from the start and end of the list."""
+    listout = copy.copy(listin)
+    while not listout[0]:
+        listout.pop(0)
+    while not listout[-1]:
+        listout.pop()
+    return listout
+
+def clean_list_regexp(listin, pat='^[ ,]*$'):
+    listout = copy.copy(listin)
+    p = re.compile(pat)
+    while p.match(listout[0]):
+        listout.pop(0)
+    while p.match(listout[-1]):
+        listout.pop()
+    return listout
+                       
+    
 def RegExpPop(listin, pat, returnq=False, multiline=False):
     if multiline:
         mystr = '\n'.join(listin)

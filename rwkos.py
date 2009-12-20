@@ -238,6 +238,22 @@ def FindAllSubFolders(topdir, skipdirs=[]):
     #print('t2-t1='+str(t2-t1))
     return alldirs
 
+def glob_all_subdirs(topdir, glob_pat, skipdirs=[]):
+    t1 = time.time()
+    alldirs = FindAllSubFolders(topdir, skipdirs=skipdirs)
+    t2 = time.time()
+    allmatches = None
+    for curdir in alldirs:
+        curpat = os.path.join(curdir, glob_pat)
+        curmatches = glob.glob(curpat)
+        if allmatches is None:
+            allmatches = curmatches
+        else:
+            allmatches.extend(curmatches)
+    t3 = time.time()
+    #print('t3-t1='+str(t3-t1))
+    #print('t2-t1='+str(t2-t1))
+    return allmatches
 
 def DirsInThisLevel(pathin):
     contents = os.listdir(pathin)
