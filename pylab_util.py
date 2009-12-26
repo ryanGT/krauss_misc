@@ -48,7 +48,15 @@ def plot_cols(t, mat, fi=1, clear=True, leg=None, ylabel=None, \
     if xlim:
         PL.xlim(xlim)
 
-        
+
+def set_ylabel(ylabel, fi=1):
+    PL.figure(fi)
+    PL.ylabel(ylabel)
+
+def set_xlabel(xlabel, fi=1):
+    PL.figure(fi)
+    PL.xlabel(xlabel)
+    
 def Increase_YLim(ypos, yneg=None, fi=None):
     ax = _get_first_axis(fi)
     mplutil.Increase_YLim(ax, ypos, yneg)

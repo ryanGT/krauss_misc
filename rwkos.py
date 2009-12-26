@@ -131,6 +131,9 @@ def FindFullPath(relpath, basepaths=['D:\\','C:\\ryan']):
         myname = socket.gethostname()
         if myname == 'ryan-duo-laptop':
             basepaths.extend(['/mnt/RYANFAT/'])
+    if relpath[0] == '~':
+        home = get_home()
+        relpath = os.path.join(home,relpath[1:])
     relpath = makerel(relpath)
     folder, filename = os.path.split(relpath)
     if not folder:
