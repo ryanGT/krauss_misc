@@ -15,8 +15,8 @@ graph_path = rwkos.FindFullPath(graph_path)
 classes_base = '/home/ryan/siue/classes'
 classes_base = rwkos.FindFullPath(classes_base)
 
-keys = ['452','mechatronics','482','484','356','mobile_robotics']
-nums = ['452','458','482','484','356','492']
+keys = ['452','mechatronics','482','484','356','mobile_robotics','450']
+nums = ['452','458','482','484','356','492','450']
 course_num_dict = dict(zip(keys, nums))
 
 bases = ['452/lectures', 'mechatronics/2009/lectures', '482/2009/lectures', \
