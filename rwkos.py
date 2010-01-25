@@ -347,3 +347,16 @@ def copy_making_dirs(source_path, dest_path):
         if not os.path.exists(curroot):
             os.mkdir(curroot)
     shutil.copy2(source_path, dest_path)
+
+def make_dir(pathin):
+    """Check to see if pathin exists first, then make it if it
+    doesn't.  No error is generated if pathin already exists."""
+    if not os.path.exists(pathin):
+        os.mkdir(pathin)
+
+
+def make_dirs(paths):
+    """Pass each path in the list paths to make_dir, which makes the
+    directory if it doesn't already exist."""
+    for path in paths:
+        make_dir(path)
