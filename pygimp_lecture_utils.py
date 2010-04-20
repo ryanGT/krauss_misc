@@ -123,14 +123,16 @@ def find_lecture_path():
     #log_msg('pathout = %s' % pathout)
     return pathout
     
-def set_lecture_path():
+def set_lecture_path(pathin=None):
     #log_msg('------')
     #log_msg('in set_lecture_path')
     if os.path.exists(lecturerc_path):
         mydict = rwkmisc.LoadPickle(lecturerc_path)
     else:
         mydict = {}
-    mydict['lecture_path'] = find_lecture_path()
+    if pathin is None:
+        pathin = find_lecture_path()
+    mydict['lecture_path'] = pathin
     #log_msg('setting lecture_path to %s' % mydict['lecture_path'])
     rwkmisc.SavePickle(mydict, lecturerc_path)
     return mydict['lecture_path']

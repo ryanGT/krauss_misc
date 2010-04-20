@@ -8,6 +8,14 @@ def amiLinux():
     else:
         return 0
 
+def splittolist(pathstr):
+    listout = pathstr.split(os.sep)
+    while not listout[-1]:
+        listout.pop()
+    while not listout[0]:
+        listout.pop(0)
+    return listout
+
 
 def walkuplist(pathstr):
     sep=os.sep
