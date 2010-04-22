@@ -114,3 +114,10 @@ def SetPhaseLim(fi, *args, **kwargs):
 
 def SetLegend(fi, *args, **kwargs):
     return _call_mplutil_w_fig(fi, 'SetLegend', *args, **kwargs)
+
+
+def SetPhaseTicks(fi, *args, **kwargs):
+    return _call_mplutil_w_fig(fi, 'SetPhaseTicks', *args, **kwargs)
+
+def SetMagTicks(fi, *args, **kwargs):
+    return _call_mplutil_w_fig(fi, 'SetMagTicks', *args, **kwargs)

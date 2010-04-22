@@ -42,13 +42,7 @@ def SetAllXlims(fig, xlim):
         axis.set_xlim(xlim)
 
 
-def SetMagLim(fig, maglim, axis=None):
-    """Set the magnitude limits of a Bode plot by calling SetYLim
-    attempting to intelligently determine the phase axis if axis is
-    None.  If fig has two axes, this is assumed to be a Bode plot
-    without coherence and axis=0.  If fig has 3 axes, this is assumed
-    to be a Bode+Coherence plot with magnitude on axis 1.  Axis can be
-    mannually overridden if necessary."""
+def GetMagAxis(fig, axis=None):
     if axis is None:
         if len(fig.axes) == 2:
             axis = 0
@@ -56,7 +50,40 @@ def SetMagLim(fig, maglim, axis=None):
             axis = 1
         else:
             axis = 0
+    return axis
+
+def SetMagLim(fig, maglim, axis=None):
+    """Set the magnitude limits of a Bode plot by calling SetYLim
+    attempting to intelligently determine the phase axis if axis is
+    None.  If fig has two axes, this is assumed to be a Bode plot
+    without coherence and axis=0.  If fig has 3 axes, this is assumed
+    to be a Bode+Coherence plot with magnitude on axis 1.  Axis can be
+    mannually overridden if necessary."""
+    axis = GetMagAxis(fig, axis)
     SetYLim(fig, maglim, axis)
+
+
+def SetMagTicks(fig, ticks, axis=None):
+    """Set the magnitude yticks of a Bode plot by calling SetYLim
+    attempting to intelligently determine the phase axis if axis is
+    None.  If fig has two axes, this is assumed to be a Bode plot
+    without coherence and axis=0.  If fig has 3 axes, this is assumed
+    to be a Bode+Coherence plot with magnitude on axis 1.  Axis can be
+    mannually overridden if necessary."""
+    axis = GetMagAxis(fig, axis)
+    SetYTicks(fig, ticks, axis)
+
+
+def GetPhaseAxis(fig, axis=None):
+    if axis is None:
+        if len(fig.axes) == 2:
+            axis = 1
+        elif len(fig.axes) == 3:
+            axis = 2
+        else:
+            axis = -1
+    #if axis is not None, this will just pass back what was passed in
+    return axis
 
 
 def SetPhaseLim(fig, phaselim, axis=None):
@@ -66,14 +93,18 @@ def SetPhaseLim(fig, phaselim, axis=None):
     without coherence and axis=1.  If fig has 3 axes, this is assumed
     to be a Bode+Coherence plot with phase on axis 2.  Axis can be
     mannually overridden if necessary."""
-    if axis is None:
-        if len(fig.axes) == 2:
-            axis = 1
-        elif len(fig.axes) == 3:
-            axis = 2
-        else:
-            axis = -1
+    axis = GetPhaseAxis(fig, axis)
     SetYLim(fig, phaselim, axis)
+
+def SetPhaseTicks(fig, ticks, axis=None):
+    """Set the phase yticks of a Bode plot by calling SetYTicks,
+    attempting to intelligently determine the phase axis if axis is
+    None.  If fig has two axes, this is assumed to be a Bode plot
+    without coherence and axis=1.  If fig has 3 axes, this is assumed
+    to be a Bode+Coherence plot with phase on axis 2.  Axis can be
+    mannually overridden if necessary."""
+    axis = GetPhaseAxis(fig, axis)
+    SetYTicks(fig, ticks, axis)
 
 
 def SetCohLim(fig, cohlim, axis=0):
@@ -87,6 +118,10 @@ def SetYLim(fig, ylim, axis=0):
     """Set the ylim of fig.axes[axis] to ylim."""
     fig.axes[axis].set_ylim(ylim)
 
+
+def SetYTicks(fig, ticks, axis=0):
+    fig.axes[axis].set_yticks(ticks)
+    
 
 def SetTitle(fig, title, axis=0):
     fig.axes[axis].set_title(title)
