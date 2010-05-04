@@ -54,6 +54,15 @@ class txt_list(list):
             return linenums
 
 
+    def find(self, pattern, **kwargs):
+        out = self._find(pattern, **kwargs)
+        if out is None:
+            return out
+        if len(out) > 1:
+            print('found more than one match for ' + pattern)
+        return out[0]
+
+
     def find_next_non_comment(self, com_sym='#', start_ind=0):
         """Find the next line that doesn't start with a comment."""
         for x, line in enumerate(self[start_ind:]):
@@ -152,6 +161,20 @@ class txt_list(list):
     def get_list(self, indlist):
         list_out = [self[ind] for ind in indlist]
         return txt_list(list_out)
+
+
+    def find_unique(self):
+        temp = [1]*len(self)
+        mydict = dict(zip(self, temp))
+        return mydict.keys()
+
+    def count(self, value):
+        mycount = 0
+        for item in self:
+            if item == value:
+                mycount += 1
+        return mycount
+        
     
 
 default_map = ['findall', 'findallre', 'findprevious', \
