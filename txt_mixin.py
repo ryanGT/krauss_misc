@@ -158,6 +158,32 @@ class txt_list(list):
             self[n] = line
 
 
+    def replace_before(self, pat1, pat2, replace_pat, max_N=10, \
+                       match=False, start_ind=0):
+        """Search for pat1 in list, asserting that there is only one
+        instance of it.  The search for the first instance of pat2
+        before pat1.  Replace this instance of pat2 with replace_pat.
+        pat1, pat2, and replace_pat are all regexps.  max_N refers to
+        the maximumu line difference between pat1 and pat2.
+
+        match refers to forcing pat1 and pat2 to be anchored to the
+        beginning of a line.  start_ind refers to the first index of
+        list to be used in searching for pat1."""
+        inds = self.findallre(pat1, match=match, start_ind=start_ind)
+        assert len(inds)==1, "Did not find exactly one match for the regular expression %s \n" % pat1 + \
+               "len(inds)=%i" % len(inds)
+        N1 = inds[0]
+        inds2 = self.findallre(pat2, match=match)
+        assert len(inds2) > 0, "Did not find %s in self.list" % pat2
+        filt_inds = [item for item in inds2 if item < N1]
+        assert len(filt_inds) > 0, "Did not find %s before %s" % (pat1, pat2)
+        N2 = filt_inds[-1]
+        line = self[N2]
+        p = re.compile(pat2)
+        lineout = p.sub(replace_pat, line)
+        self[N2] = lineout
+        
+                       
     def get_list(self, indlist):
         list_out = [self[ind] for ind in indlist]
         return txt_list(list_out)
@@ -180,6 +206,7 @@ class txt_list(list):
 default_map = ['findall', 'findallre', 'findprevious', \
                'findnext', 'replaceall', 'findnextblank', \
                'replaceallre', 'append','extend', \
+               'replace_before', \
                '__delitem__','__len__','__delattr__', \
                '__delslice__','__getitem__','__setattr__', \
                '__getslice__','__setitem__','__setslice__']

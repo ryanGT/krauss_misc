@@ -160,18 +160,21 @@ def SetLegend(fig, legend_list, axis=0, loc=3):
 
 def plot_cols(ax, t, mat, clear=True, leg=None, ylabel=None, \
               xlabel='Time (sec)', legloc=1, ylim=[], xlim=[], \
-              **kwargs):
+              linetypes=None, **kwargs):
     if clear:
         ax.clear()
-    for col in mat.T:
-        ax.plot(t, col, **kwargs)
+    if linetypes is None:
+        nr, nc = mat.shape
+        linetypes = ['-']*nc
+    for col, lt in zip(mat.T, linetypes):
+        ax.plot(t, col, lt,**kwargs)
     if ylabel:
         ax.set_ylabel(ylabel)
     if xlabel:
         ax.set_xlabel(xlabel)
     if leg:
-        print('leg=%s' % leg)
-        print('legloc=%s' % legloc)
+        #print('leg=%s' % leg)
+        #print('legloc=%s' % legloc)
         ax.legend(leg, loc=legloc)
     if ylim:
         ax.set_ylim(ylim)
