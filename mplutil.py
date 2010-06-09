@@ -156,18 +156,46 @@ def SetLegend(fig, legend_list, axis=0, loc=3):
         axis = 2
     #print('axis=%s' % axis)
     fig.axes[axis].legend(legend_list, loc)
-    
+
+
+def create_numbered_subscripts(labelin, nc):
+    if nc == 1:
+        #just make a list out of it
+        return [labelin]
+    else:
+        usetex = bool(labelin[-1] == '$')
+        if usetex:
+            baselabel = labelin[0:-1]
+        else:
+            baselabel = labelin
+        baselabel += '_{%i}'
+        if usetex:
+            baselabel += '$'
+        for i in range(nc):
+            curlabel = baselabel % (i+1)
+            if i == 0:
+                labelsout = [curlabel]
+            else:
+                labelsout.append(curlabel)
+        return labelsout
+
 
 def plot_cols(ax, t, mat, clear=True, leg=None, ylabel=None, \
               xlabel='Time (sec)', legloc=1, ylim=[], xlim=[], \
-              linetypes=None, **kwargs):
+              linetypes=None, labels=None, **kwargs):
     if clear:
         ax.clear()
     if linetypes is None:
         nr, nc = mat.shape
         linetypes = ['-']*nc
-    for col, lt in zip(mat.T, linetypes):
-        ax.plot(t, col, lt,**kwargs)
+    nr, nc = mat.shape
+    if labels is None:
+        labels = [None]*nc
+    elif type(labels) == str:
+        #create labels with numbered subscripts if needed
+        labels = create_numbered_subscripts(labels, nc)
+    for col, lt, label in zip(mat.T, linetypes, labels):
+        ax.plot(t, col, lt, label=label, **kwargs)
     if ylabel:
         ax.set_ylabel(ylabel)
     if xlabel:
