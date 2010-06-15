@@ -97,6 +97,19 @@ def matrix_func(M, func, *args, **kwargs):
         out_list[r] = row_out
     outmat = sympy.Matrix(out_list)
     return outmat
+
+
+def matrix_subs(M, sub_dict):
+    temp = copy.copy(M)
+    out_list = temp.tolist()
+    for r, row in enumerate(out_list):
+        for i, item in enumerate(row):
+            Pdb().set_trace()
+            item_out = item.subs(sub_dict)
+            row[i] = item_out
+        out_list[r] = row
+    outmat = sympy.Matrix(out_list)
+    return outmat
         
     
 def matrix_collect_v1(M, listin):
