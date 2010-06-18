@@ -121,3 +121,7 @@ def SetPhaseTicks(fi, *args, **kwargs):
 
 def SetMagTicks(fi, *args, **kwargs):
     return _call_mplutil_w_fig(fi, 'SetMagTicks', *args, **kwargs)
+
+def set_Bode_opts(fi, bodeopts, coh=True):
+    fig = _get_fig(fi)
+    mplutil.set_Bode_opts(fig, bodeopts, coh=coh)

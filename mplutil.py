@@ -140,7 +140,7 @@ def Legend(legend_list, fig, axis=0, loc=3):
     fig.axes[axis].legend(legend_list, loc)
 
 
-def SetLegend(fig, legend_list, axis=0, loc=3):
+def SetLegend(fig, legend_list=None, axis=0, loc=3):
     #print('axis=%s' % axis)
     if type(axis) == str:
         axis = int(axis)
@@ -155,7 +155,10 @@ def SetLegend(fig, legend_list, axis=0, loc=3):
     elif axis == 313:        
         axis = 2
     #print('axis=%s' % axis)
-    fig.axes[axis].legend(legend_list, loc)
+    if legend_list is not None:
+        fig.axes[axis].legend(legend_list, loc)
+    else:
+        fig.axes[axis].legend(loc=loc)
 
 
 def create_numbered_subscripts(labelin, nc):
