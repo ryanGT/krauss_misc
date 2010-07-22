@@ -157,6 +157,24 @@ class txt_list(list):
             line = p.sub(reppat, line)
             self[n] = line
 
+    def find_before(self, pat1, pat2, usere=True, \
+                    max_N=10, match=False, start_ind=0):
+        inds = self.findallre(pat1, match=match, start_ind=start_ind)
+        assert len(inds)==1, "Did not find exactly one match for the regular expression %s \n" % pat1 + \
+               "len(inds)=%i" % len(inds)
+        N1 = inds[0]
+        if usere:
+            inds2 = self.findallre(pat2, match=match)
+        else:
+            inds2 = self.findall(pat2)
+        assert len(inds2) > 0, "Did not find %s in self.list" % pat2
+        filt_inds = [item for item in inds2 if item < N1]
+        assert len(filt_inds) > 0, "Did not find %s before %s" % (pat1, pat2)
+        N2 = filt_inds[-1]
+        assert N1-N2 < max_N, "Did not find %s within %i lines of %s" % (pat2, max_N, pat1)
+        line = self[N2]
+        return line, N2
+        
 
     def replace_before(self, pat1, pat2, replace_pat, max_N=10, \
                        match=False, start_ind=0):
@@ -169,19 +187,20 @@ class txt_list(list):
         match refers to forcing pat1 and pat2 to be anchored to the
         beginning of a line.  start_ind refers to the first index of
         list to be used in searching for pat1."""
-        inds = self.findallre(pat1, match=match, start_ind=start_ind)
-        assert len(inds)==1, "Did not find exactly one match for the regular expression %s \n" % pat1 + \
-               "len(inds)=%i" % len(inds)
-        N1 = inds[0]
-        inds2 = self.findallre(pat2, match=match)
-        assert len(inds2) > 0, "Did not find %s in self.list" % pat2
-        filt_inds = [item for item in inds2 if item < N1]
-        assert len(filt_inds) > 0, "Did not find %s before %s" % (pat1, pat2)
-        N2 = filt_inds[-1]
-        line = self[N2]
+        line, N2 = self.find_before(pat1, pat2, usere=True, \
+                                    max_N=max_N, match=match, \
+                                    start_ind=start_ind)
         p = re.compile(pat2)
         lineout = p.sub(replace_pat, line)
         self[N2] = lineout
+
+
+    def replace_line_before(self, pat1, oldline, newline, max_N=10, \
+                            match=False, start_ind=0):
+        line, N2 = self.find_before(pat1, oldline, usere=False, \
+                                    max_N=max_N, match=match, \
+                                    start_ind=start_ind)
+        self[N2] = newline
         
                        
     def get_list(self, indlist):
@@ -206,7 +225,7 @@ class txt_list(list):
 default_map = ['findall', 'findallre', 'findprevious', \
                'findnext', 'replaceall', 'findnextblank', \
                'replaceallre', 'append','extend', \
-               'replace_before', \
+               'replace_before', 'replace_line_before', \
                '__delitem__','__len__','__delattr__', \
                '__delslice__','__getitem__','__setattr__', \
                '__getslice__','__setitem__','__setslice__']
