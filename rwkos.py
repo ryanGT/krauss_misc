@@ -360,3 +360,51 @@ def make_dirs(paths):
     directory if it doesn't already exist."""
     for path in paths:
         make_dir(path)
+
+
+class folder(object):
+    def __init__(self, root, skipdirs=[]):
+        self.root = root
+        self.skipdirs = skipdirs
+
+
+    def find_all_subfolders(self):
+        self.dirs = FindAllSubFolders(self.root, skipdirs=self.skipdirs)
+        self.reldirs = [os.path.relpath(item, start=self.root) \
+                        for item in self.dirs]
+
+
+class picture_folder(folder):
+    def __init__(self, root, \
+                 skipdirs=['900by600','thumbnails','html','.comments']):
+        folder.__init__(self, root, skipdirs=skipdirs)
+
+
+
+
+def walk_copy_folders(root1, root2, \
+                      skipdirs=['.comments', '900by600', \
+                                'html', 'thumbnails'], \
+                      copyfolders=False):
+    """Copy folders that are in root1 but not in root2 to root2 using
+    shutil.copytree"""
+    if not copy:
+        print('='*10)
+        print('')
+        print('copyfolders is False, this is just a practice')
+        print('')
+        print('='*10)
+        
+    for root, dirs, files in os.walk(root1):
+        temppath, foldername = os.path.split(root)
+        if foldername not in skipdirs:
+            relpath = os.path.relpath(root, start=root1)
+            #print('relpath = ' + relpath)
+
+            destpath = os.path.join(root2, relpath)
+            if not os.path.exists(destpath):
+                print('missing dir: ' + str(relpath))
+                if copyfolders:
+                    print('copying ' + relpath)
+                    shutil.copytree(root, destpath)
+
