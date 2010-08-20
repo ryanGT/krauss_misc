@@ -121,7 +121,7 @@ def checklower(pathin, folder=None):
         return None
         
 
-def FindFullPath(relpath, basepaths=['D:\\','C:\\ryan']):
+def FindFullPath(relpath, basepaths=['Z:\\','D:\\','C:\\ryan']):
     outpath=''
     #print('relpath='+str(relpath))
     if amiLinux():

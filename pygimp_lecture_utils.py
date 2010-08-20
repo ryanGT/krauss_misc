@@ -9,7 +9,7 @@ home = rwkos.get_home()
 lecturerc_name = 'pygimp_lecturerc.pkl'
 lecturerc_path = os.path.join(home, lecturerc_name)
 log_path = os.path.join(home, 'pygimp_log.txt')
-graph_path = '/home/ryan/siue/classes/graph_paper.png'
+graph_path = '/home/ryan/siue/classes/graph_paper_2000_by_1300.png'
 graph_path = rwkos.FindFullPath(graph_path)
 
 classes_base = '/home/ryan/siue/classes'
@@ -122,6 +122,7 @@ def find_lecture_path():
     pathout = validate_lecture_path(path_chosen)
     #log_msg('pathout = %s' % pathout)
     return pathout
+
     
 def set_lecture_path(pathin=None):
     #log_msg('------')
@@ -136,6 +137,21 @@ def set_lecture_path(pathin=None):
     #log_msg('setting lecture_path to %s' % mydict['lecture_path'])
     rwkmisc.SavePickle(mydict, lecturerc_path)
     return mydict['lecture_path']
+
+
+def open_pickle():
+    mydict = rwkmisc.LoadPickle(lecturerc_path)
+    return mydict
+
+
+def save_pickle(mydict):
+    rwkmisc.SavePickle(mydict, lecturerc_path)
+
+    
+def folder_from_pickle():
+    mydict = open_pickle()
+    return mydict['lecture_path']
+
 
 def get_path_from_pkl():
     if os.path.exists(lecturerc_path):
@@ -218,7 +234,7 @@ def get_slide_num_filename(myint=None, pat=None):
         os.mkdir(folder)
     if pat is None:
         cn = get_course_number()
-        pat = 'ME' + cn+ '_'+date_str+'_%0.4d.png'
+        pat = 'ME' + cn + '_'+date_str+'_%0.4d.png'
     #log_msg('myint=%s' % myint)
     if myint is None:
         new_ind = rwkos.get_new_file_number(pat, folder)
@@ -229,3 +245,15 @@ def get_slide_num_filename(myint=None, pat=None):
     return new_name, new_ind
 
 
+def get_slide_num_filename_2010(myint=None):
+    mydict = open_pickle()
+    pat = mydict['pat']
+    folder = mydict['lecture_path']
+    if myint is None:
+        new_ind = rwkos.get_new_file_number(pat, folder)
+    else:
+        new_ind = myint
+    #log_msg('new_ind=%s' % new_ind)
+    new_name = pat % new_ind
+    return new_name, new_ind
+    
