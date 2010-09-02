@@ -87,15 +87,20 @@ class txt_list(list):
 ##         return linenums
 
 
-    def replaceall(self, findpat, rep, forcestart=0):
+    def replaceall(self, findpat, rep, forcestart=0, \
+                   callmanytimes=0):
         inds = self.findall(findpat, forcestart=forcestart)
         for ind in inds:
             linein = self[ind]
             temp = linein
             lineout = linein.replace(findpat, rep)
-            while temp != lineout:
-                temp = lineout
-                lineout = lineout.replace(findpat, rep)
+            #I don't think this makes sense.  For a recent case, I
+            #wanted to replace Gth with Gth(s).  This causes an
+            #endless loop.  What is wrong with just one replacement?
+            if callmanytimes:
+                while temp != lineout:
+                    temp = lineout
+                    lineout = lineout.replace(findpat, rep)
             self[ind] = lineout
             
 
