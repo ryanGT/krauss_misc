@@ -23,7 +23,7 @@ course_num_dict = dict(zip(keys, nums))
 
 bases = ['452/lectures', 'mechatronics/2009/lectures', '482/2009/lectures', \
          '484/lectures', '356/Fall_2009/lectures', \
-         'mobile_robotics/2009/lectures']
+         'mobile_robotics/2010/lectures']
 
 if not Linux:
     bases = [item.replace('/','\\') for item in bases]
