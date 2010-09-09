@@ -589,3 +589,8 @@ def flatten(seq):
     while seqin(seq):
         seq = rflat(seq)
     return seq
+
+def find_unique(listin):
+    temp = [1]*len(listin)
+    mydict = dict(zip(listin, temp))
+    return mydict.keys()
