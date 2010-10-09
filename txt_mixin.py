@@ -143,7 +143,8 @@ class txt_list(list):
         If match=1 or True, then a match is preformed, anchoring the
         search to the begining of each line.  match=0 or False calls
         re.search which matches pattern anywhere in the current line."""
-        return self._find(pattern, regexp=True, match=match)
+        return self._find(pattern, regexp=True, match=match, \
+                         start_ind=start_ind)
 ##         p=re.compile(pattern)
 ##         linenums=[]
 ##         for line,x in zip(self, range(len(self))):
