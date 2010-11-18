@@ -41,6 +41,15 @@ def SetAllXlims(fig, xlim):
     for axis in fig.axes:
         axis.set_xlim(xlim)
 
+def SetXlim(fig, xlim):
+    """alias for SetAllXlims"""
+    return SetAllXlims(fig, xlim)
+
+
+def SetYlim(fig, ylim, axis=0):
+    """alias for SetAllXlims"""
+    fig.axes[axis].set_ylim(ylim)
+
 
 def GetMagAxis(fig, axis=None):
     if axis is None:

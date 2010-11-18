@@ -89,6 +89,17 @@ def SetTitle(fignum, title, axis=0):
 def SetAllXlims(fi, xlim):
     fig = _get_fig(fi)
     mplutil.SetAllXlims(fig, xlim)
+
+
+def SetXlim(fi, xlim):
+    fig = _get_fig(fi)
+    mplutil.SetXlim(fig, xlim)
+
+
+def SetYlim(fi, ylim):
+    fig = _get_fig(fi)
+    mplutil.SetYlim(fig, ylim)
+
     
 def SetFreqLim(fi, xlim):
     SetAllXlims(fi, xlim)
