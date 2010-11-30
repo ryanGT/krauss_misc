@@ -3,6 +3,11 @@ import pdb
 import shutil
 #from  IPython.Debugger import Pdb
 
+def epstopdfpath(epspath):
+    pne, ext = os.path.splitext(epspath)
+    pdfpath = pne + '.pdf'
+    return pdfpath
+
 def get_home():
     """Get the users home directory on either windows or linux."""
     home_dir = os.getenv('HOME') or os.getenv('USERPROFILE')
