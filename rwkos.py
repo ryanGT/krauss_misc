@@ -3,6 +3,12 @@ import pdb
 import shutil
 #from  IPython.Debugger import Pdb
 
+def delete_from_glob_pat(pat):
+    myfiles = glob.glob(pat)
+    for curpath in myfiles:
+        os.remove(curpath)
+        
+
 def epstopdfpath(epspath):
     pne, ext = os.path.splitext(epspath)
     pdfpath = pne + '.pdf'

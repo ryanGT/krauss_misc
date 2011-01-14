@@ -430,6 +430,18 @@ def _really_save(img, savepath):
     gimp.displays_flush()
 
 
+def save_flattened_copy(img, savepath):
+    pdb.gimp_selection_all(img)
+    pdb.gimp_edit_copy_visible(img)
+    img2 = pdb.gimp_edit_paste_as_new()
+    flat_layer = pdb.gimp_image_flatten(img2)
+    #gimp.Display(img2)
+    pdb.gimp_file_save(img2, flat_layer, savepath, savepath)
+    pdb.gimp_image_delete(img2)
+    #pdb.gimp_image_clean_all(img)
+    #gimp.displays_flush()
+
+
 def folder_and_pngpath_from_rstpath(rstpath):
     folder, rstname = os.path.split(rstpath)
     filename, ext = os.path.splitext(rstname)
