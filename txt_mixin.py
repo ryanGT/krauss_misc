@@ -58,6 +58,8 @@ class txt_list(list):
         out = self._find(pattern, **kwargs)
         if out is None:
             return out
+        if out == []:
+            return None
         if len(out) > 1:
             print('found more than one match for ' + pattern)
         return out[0]

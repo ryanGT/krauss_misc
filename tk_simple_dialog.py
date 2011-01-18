@@ -312,8 +312,9 @@ class reset_lecture_dialog:#(tkSimpleDialog.Dialog):
         self.go_btn = Tkinter.Button(self.mw,
                                      text = "Go",
                                      command = self.close)
+        self.go_btn.bind("<Return>", self.close)
         self.go_btn.grid(row=4)
-        
+        self.go_btn.focus_set()
         self.mw.title(title)
         self.mw.mainloop()
 
