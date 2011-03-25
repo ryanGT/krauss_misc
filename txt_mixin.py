@@ -36,13 +36,17 @@ class txt_list(list):
                 if m:
                     linenums.append(x+start_ind)
             else:
-                ind=line.find(pattern)
-                if forcestart:
-                    if ind==0:
+                if match:
+                    if line == pattern:
                         linenums.append(x+start_ind)
                 else:
-                    if ind > -1:
-                        linenums.append(x+start_ind)
+                    ind=line.find(pattern)
+                    if forcestart:
+                        if ind==0:
+                            linenums.append(x+start_ind)
+                    else:
+                        if ind > -1:
+                            linenums.append(x+start_ind)
             if linenums and only_one:
                 break
         if only_one:
@@ -74,9 +78,9 @@ class txt_list(list):
                 
 
 
-    def findall(self, pattern, forcestart=0, start_ind=0):
+    def findall(self, pattern, forcestart=0, start_ind=0, **kwargs):
         return self._find(pattern, forcestart=forcestart, \
-                          start_ind=start_ind)
+                          start_ind=start_ind, **kwargs)
 ##         linenums=[]
 ##         for line,x in zip(self, range(len(self))):
 ##             ind=line.find(pattern)
