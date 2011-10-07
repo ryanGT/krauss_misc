@@ -77,6 +77,35 @@ def LoadPickle(filepath):
     return mydict
 
 
+class object_that_saves(object):
+    """This is a mixin class for saving and loading objects using
+    SavePickle and LoadPickle.  The object must have saveattrs
+    defined; it is a list of strings that refer to the attributes to
+    save and/or load."""
+    def build_dict(self):
+        mydict = {}
+        for attr in self.saveattrs:
+            val = getattr(self, attr)
+            mydict[attr] = val
+        return mydict
+
+
+    def set_attrs(self, mydict):
+        for attr, val in mydict.iteritems():
+            setattr(self, attr, val)
+
+            
+    def save(self, filepath, protocol=2):
+        mydict = self.build_dict()
+        SavePickle(mydict, filepath, \
+                   protocol=protocol)
+        
+
+    def load(self, filepath):
+        mydict = LoadPickle(filepath)
+        self.set_attrs(mydict)
+        
+    
 def load_from_pickle(filename, key):
     mydict = LoadPickle(filename)
     return mydict[key]
@@ -213,16 +242,6 @@ class symstr(rwkstr):
     def __neg__(self):
         return symstr('-'+self)
 
-
-#def fullfile(path,file): #concatinate file strings intelligently
-#    tempout=path+'\\'+file
-#    temp2=tempout.replace('\\\\','\\')
-#    while temp2!=tempout:
-#        tempout=temp2
-#        temp2=tempout.replace('\\\\','\\')
-
-#    fileout=tempout
-#    return tempout
 
 class dictobject:
     def __init__(self,**kwargs):
@@ -589,3 +608,8 @@ def flatten(seq):
     while seqin(seq):
         seq = rflat(seq)
     return seq
+
+def find_unique(listin):
+    temp = [1]*len(listin)
+    mydict = dict(zip(listin, temp))
+    return mydict.keys()

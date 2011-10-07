@@ -1,5 +1,5 @@
 import mplutil
-reload(mplutil)
+#reload(mplutil)
 
 import pylab as PL
 
@@ -21,9 +21,30 @@ def _get_first_axis(fi=None):
     return myfig.get_axes()[0]
 
 
-def mysave(path_in, fi=None, ext='.eps', dpi=100):
+def _get_ext(pathin, ext):
+    fno, ext0 = os.path.splitext(pathin)
+    if ext0:
+        return ext0
+    else:
+        return ext
+
+def _build_pdf_path(pathin):
+    fno, ext0 = os.path.splitext(pathin)
+    pdfpath = fno + '.pdf'
+    return pdfpath
+
+    
+def mysave(path_in, fi=None, ext='.eps', dpi=100, pdfcrop=1):
     myfig = _get_fig(fi)
     mplutil.mysave(path_in, myfig, ext=ext, dpi=dpi)
+    if pdfcrop:
+        pdfpath = _build_pdf_path(path_in)
+        if os.path.exists(pdfpath):
+            cmd = 'pdfcrop %s %s' % (pdfpath, pdfpath)
+            print(cmd)
+            os.system(cmd)
+
+    
 
 
 def plot_cols(t, mat, fi=1, clear=True, leg=None, ylabel=None, \
@@ -89,6 +110,17 @@ def SetTitle(fignum, title, axis=0):
 def SetAllXlims(fi, xlim):
     fig = _get_fig(fi)
     mplutil.SetAllXlims(fig, xlim)
+
+
+def SetXlim(fi, xlim):
+    fig = _get_fig(fi)
+    mplutil.SetXlim(fig, xlim)
+
+
+def SetYlim(fi, ylim):
+    fig = _get_fig(fi)
+    mplutil.SetYlim(fig, ylim)
+
     
 def SetFreqLim(fi, xlim):
     SetAllXlims(fi, xlim)

@@ -36,13 +36,17 @@ class txt_list(list):
                 if m:
                     linenums.append(x+start_ind)
             else:
-                ind=line.find(pattern)
-                if forcestart:
-                    if ind==0:
+                if match:
+                    if line == pattern:
                         linenums.append(x+start_ind)
                 else:
-                    if ind > -1:
-                        linenums.append(x+start_ind)
+                    ind=line.find(pattern)
+                    if forcestart:
+                        if ind==0:
+                            linenums.append(x+start_ind)
+                    else:
+                        if ind > -1:
+                            linenums.append(x+start_ind)
             if linenums and only_one:
                 break
         if only_one:
@@ -58,7 +62,7 @@ class txt_list(list):
         out = self._find(pattern, **kwargs)
         if out is None:
             return out
-        if len(out) == 0:
+        if out == []:
             return None
         if len(out) > 1:
             print('found more than one match for ' + pattern)
@@ -74,9 +78,9 @@ class txt_list(list):
                 
 
 
-    def findall(self, pattern, forcestart=0, start_ind=0):
+    def findall(self, pattern, forcestart=0, start_ind=0, **kwargs):
         return self._find(pattern, forcestart=forcestart, \
-                          start_ind=start_ind)
+                          start_ind=start_ind, **kwargs)
 ##         linenums=[]
 ##         for line,x in zip(self, range(len(self))):
 ##             ind=line.find(pattern)
@@ -89,15 +93,20 @@ class txt_list(list):
 ##         return linenums
 
 
-    def replaceall(self, findpat, rep, forcestart=0):
+    def replaceall(self, findpat, rep, forcestart=0, \
+                   callmanytimes=0):
         inds = self.findall(findpat, forcestart=forcestart)
         for ind in inds:
             linein = self[ind]
             temp = linein
             lineout = linein.replace(findpat, rep)
-            while temp != lineout:
-                temp = lineout
-                lineout = lineout.replace(findpat, rep)
+            #I don't think this makes sense.  For a recent case, I
+            #wanted to replace Gth with Gth(s).  This causes an
+            #endless loop.  What is wrong with just one replacement?
+            if callmanytimes:
+                while temp != lineout:
+                    temp = lineout
+                    lineout = lineout.replace(findpat, rep)
             self[ind] = lineout
             
 
@@ -140,7 +149,8 @@ class txt_list(list):
         If match=1 or True, then a match is preformed, anchoring the
         search to the begining of each line.  match=0 or False calls
         re.search which matches pattern anywhere in the current line."""
-        return self._find(pattern, regexp=True, match=match)
+        return self._find(pattern, regexp=True, match=match, \
+                         start_ind=start_ind)
 ##         p=re.compile(pattern)
 ##         linenums=[]
 ##         for line,x in zip(self, range(len(self))):

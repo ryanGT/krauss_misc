@@ -1,9 +1,39 @@
 from scipy import *
 import sympy
-import copy
+import copy, re
 from IPython.Debugger import Pdb
 import pdb
 
+def expr_to_Maxima_string(expr):
+    """Take a symbolic sympy expression expr and convert it to a
+    Maxima compatilbe string that will be saved to a batch file.  I
+    can't find a sympy printer that already does this."""
+    string = str(expr)
+    string = string.replace('**','^')
+    #replace imaginary number I
+    p = re.compile('\\bI\\b')
+    string = p.sub('%i',string)
+    return string
+
+
+def matrix_to_Maxima_string(matin, matname):
+    outstr = matname + ':matrix('
+    nr, nc = matin.shape
+    for i in range(nr):
+        rowstr = '['
+        for j in range(nc):
+            elemstr = expr_to_Maxima_string(matin[i,j])
+            rowstr += elemstr
+            if j < (nc-1):
+                rowstr += ','
+        rowstr += ']'
+        outstr += rowstr
+        if i < (nr-1):
+            outstr += ','
+##     Ubeamz:matrix([c1bz,1/2*Lbz*c4bz/betabz,-1/2*abz*c3bz/betabz^2,-1/2*Lbz*abz*c2bz/betabz^3],[1/2*betabz*c2bz/Lbz,c1bz,1/2*abz*c4bz/betabz/Lbz,1/2*abz*c3bz/betabz^2],[-1/2*betabz^2*c3bz/abz,1/2*betabz*Lbz*c2bz/abz,c1bz,-1/2*Lbz*c4bz/betabz],[-1/2*betabz^3*c4bz/Lbz/abz,1/2*betabz^2*c3bz/abz,-1/2*betabz*c2bz/Lbz,c1bz])$
+    outstr += ')$'
+    return outstr
+    
 def find_highest_power(nested_list):
     hp = 0
     for coeff, power in nested_list:

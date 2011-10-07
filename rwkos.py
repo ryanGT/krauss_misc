@@ -3,6 +3,17 @@ import pdb
 import shutil
 #from  IPython.Debugger import Pdb
 
+def delete_from_glob_pat(pat):
+    myfiles = glob.glob(pat)
+    for curpath in myfiles:
+        os.remove(curpath)
+        
+
+def epstopdfpath(epspath):
+    pne, ext = os.path.splitext(epspath)
+    pdfpath = pne + '.pdf'
+    return pdfpath
+
 def get_home():
     """Get the users home directory on either windows or linux."""
     home_dir = os.getenv('HOME') or os.getenv('USERPROFILE')
@@ -121,7 +132,7 @@ def checklower(pathin, folder=None):
         return None
         
 
-def FindFullPath(relpath, basepaths=['D:\\','C:\\ryan']):
+def FindFullPath(relpath, basepaths=['Z:\\','D:\\','C:\\ryan','C:\\','E:\\']):
     outpath=''
     #print('relpath='+str(relpath))
     if amiLinux():
