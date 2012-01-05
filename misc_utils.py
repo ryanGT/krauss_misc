@@ -1,4 +1,4 @@
-from scipy import column_stack, savetxt
+from numpy import column_stack, savetxt
 
 import os
 

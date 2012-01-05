@@ -200,7 +200,7 @@ def amiLinux():
         return 0
 
     
-def find_dirs(path, hidden = False, returnrel=True):
+def find_dirs(path, hidden=False, returnrel=True):
     pattern = os.path.join(path,'*')
     myfiles=glob.glob(pattern)
     if hidden:
@@ -371,6 +371,22 @@ def make_dirs(paths):
     directory if it doesn't already exist."""
     for path in paths:
         make_dir(path)
+
+def make_dirs_recrusive(dir_path):
+    """Split dir_path in to a list and make each dir in the tree that
+    doesn't already exist."""
+    sep = os.path.sep
+    mylist = dir_path.split(sep)
+    if amiLinux():
+        curroot = '/'
+    while not mylist[0]:
+        mylist.pop(0)
+    for folder in mylist:
+        curroot = os.path.join(curroot, folder)
+        #print('curroot='+curroot)
+        if not os.path.exists(curroot):
+            os.mkdir(curroot)
+
 
 
 class folder(object):
