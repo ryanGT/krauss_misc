@@ -415,7 +415,7 @@ def walk_copy_folders(root1, root2, \
                       copyfolders=False):
     """Copy folders that are in root1 but not in root2 to root2 using
     shutil.copytree"""
-    if not copy:
+    if not copyfolders:
         print('='*10)
         print('')
         print('copyfolders is False, this is just a practice')

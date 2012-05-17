@@ -7,6 +7,7 @@ it should also replace rwkmplutil."""
 from __future__ import division
 import matplotlib, os
 from numpy import column_stack
+
 from IPython.core.debugger import Pdb
 
 
