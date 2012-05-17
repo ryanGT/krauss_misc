@@ -4,7 +4,7 @@ import scipy, copy
 import time
 import os, glob, re, sys
 
-#from  IPython.Debugger import Pdb
+from IPython.core.debugger import Pdb
 #mytrace=Pdb().set_trace
 
 import cPickle
@@ -30,8 +30,8 @@ def clean_list_regexp(listin, pat='^[ ,]*$'):
     while p.match(listout[-1]):
         listout.pop()
     return listout
-                       
-    
+
+
 def RegExpPop(listin, pat, returnq=False, multiline=False):
     if multiline:
         mystr = '\n'.join(listin)
@@ -61,7 +61,7 @@ def PrintToScreen(listin, globals):
     for item in listin:
         print(item+'=%s'%eval(item, globals))
 
-    
+
 def SavePickle(mydict, filepath, protocol=2):
     """Dump dictionary mydict to a Pickle file filepath using cPickle,
     protocol=2."""
@@ -94,18 +94,18 @@ class object_that_saves(object):
         for attr, val in mydict.iteritems():
             setattr(self, attr, val)
 
-            
+
     def save(self, filepath, protocol=2):
         mydict = self.build_dict()
         SavePickle(mydict, filepath, \
                    protocol=protocol)
-        
+
 
     def load(self, filepath):
         mydict = LoadPickle(filepath)
         self.set_attrs(mydict)
-        
-    
+
+
 def load_from_pickle(filename, key):
     mydict = LoadPickle(filename)
     return mydict[key]
@@ -125,7 +125,7 @@ def myglob(pattern, folder=None):
     else:
         outnames = myfiles
     return outnames
-        
+
 
 class rwkstr(str):
     def findall(self, pattern):
@@ -153,7 +153,7 @@ class rwkstr(str):
                 return rwkstr(outstr)
             else:
                 return rwkstr(str.replace(self,old,new,maxreplace))
-    
+
     def __getslice__(self,si,ei):
 #        print('in rwkstr getslice')
         return rwkstr(str.__getslice__(self,si,ei))
@@ -178,7 +178,7 @@ class rwkstr(str):
 
     def contains(self,substr):
         return self.find(substr)!=-1
-        
+
 class symstr(rwkstr):
     def containsoperators(self,oplist=['*','+','-','/','**']):
         for co in oplist:
@@ -211,7 +211,7 @@ class symstr(rwkstr):
 
 #    def __pow__(self,other):
 #        return symstr(self+'^'+symstr(other).__addparen__())
-    
+
     def __rmul__(self,other):
         myops=['+','-']
         if not type(other)==symstr:
@@ -255,7 +255,7 @@ def SortLists(sortbylist,otherlists,reverse=False):
 
     The sortbylist is the column or list that you wish to sort by and
     otherlists is a list of the other lists or columns to sort.
-    
+
     Reverse is passed to the sort method of sortbylist."""
 
     newlist=sortbylist[:]
@@ -290,11 +290,11 @@ def mydirfilter(pathin,ignoredirs):
     return curdir not in ignoredirs
 
 def rwkFileSearchRecursive(pattern,root,outpath="",ignoredirs=[]):
-    """Starting in root, walk down through the 
-    file structure searching for pattern.  The 
+    """Starting in root, walk down through the
+    file structure searching for pattern.  The
     results are returned as a list of full paths.
-    
-    If outpath is specified, the output is also 
+
+    If outpath is specified, the output is also
     written to it as an ASCII text file."""
 
     topdirs=glob.glob(os.path.join(root,'*'))
@@ -315,7 +315,7 @@ def rwkFileSearchRecursive(pattern,root,outpath="",ignoredirs=[]):
                 curpat=os.path.join(curpath,pattern)
                 curfiles=glob.glob(curpat)
                 allpaths.extend(curfiles)
-    
+
     if outpath:
         rwkWriteArray(outpath,allpaths)
 
@@ -323,32 +323,32 @@ def rwkFileSearchRecursive(pattern,root,outpath="",ignoredirs=[]):
 
 
 
-def rwkFileSearch(pattern,searchdir="",outfile="",append=0): 
+def rwkFileSearch(pattern,searchdir="",outfile="",append=0):
     """Search for pattern in searchdir without recursing into
     the directory (does not walk the directory tree).
-    
+
     Returns files found as a list of filenames (not full paths).
-    
+
     If outfile is specified, the results are also written to
     it (or appended) as a text file."""
 
 #    import glob
 #    import os
-    
+
 #    curdir=os.getcwd()
 #    if len(searchdir)>0:
 #        os.chdir(searchdir)
-        
+
 
     #--------------------------------------------------
     # print 'pattern='+pattern
     # print 'curdir='+os.getcwd()
-    #-------------------------------------------------- 
+    #--------------------------------------------------
     curpat=os.path.join(searchdir,pattern)
     texfiles=glob.glob(curpat)
     #--------------------------------------------------
     # print 'filelist:'
-    #-------------------------------------------------- 
+    #--------------------------------------------------
     if len(outfile)>0:
         filestoprint=[]
         for k,curfile in enumerate(texfiles):
@@ -411,8 +411,8 @@ def reverse( x ):
 def null(A, eps=1e-10):
     u, s, vh = scipy.linalg.svd(A)
     null_mask = (s <= eps)
-    null_space = scipy.compress(null_mask, vh, axis=0) 
-    return scipy.transpose(scipy.conj(null_space)) 
+    null_space = scipy.compress(null_mask, vh, axis=0)
+    return scipy.transpose(scipy.conj(null_space))
 
 def colwise(matin,makecopy=1):
 #    t1=time.time()
@@ -453,7 +453,7 @@ def rowwise(matin,makecopy=1):
 #    else:
 #        return fmt%ent
 
-                    
+
 
 #def PrettyMat(mat,eps=1e-14):
 #    imat=imag(mat)

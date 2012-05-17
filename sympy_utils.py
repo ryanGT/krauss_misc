@@ -1,7 +1,7 @@
 from scipy import *
 import sympy
 import copy, re
-from IPython.Debugger import Pdb
+from IPython.core.debugger import Pdb
 import pdb
 
 def expr_to_Maxima_string(expr):
@@ -33,7 +33,7 @@ def matrix_to_Maxima_string(matin, matname):
 ##     Ubeamz:matrix([c1bz,1/2*Lbz*c4bz/betabz,-1/2*abz*c3bz/betabz^2,-1/2*Lbz*abz*c2bz/betabz^3],[1/2*betabz*c2bz/Lbz,c1bz,1/2*abz*c4bz/betabz/Lbz,1/2*abz*c3bz/betabz^2],[-1/2*betabz^2*c3bz/abz,1/2*betabz*Lbz*c2bz/abz,c1bz,-1/2*Lbz*c4bz/betabz],[-1/2*betabz^3*c4bz/Lbz/abz,1/2*betabz^2*c3bz/abz,-1/2*betabz*c2bz/Lbz,c1bz])$
     outstr += ')$'
     return outstr
-    
+
 def find_highest_power(nested_list):
     hp = 0
     for coeff, power in nested_list:
@@ -76,7 +76,7 @@ def collect_multiple(variable, collect_list):
     for cur_symbol in collect_list:
         var_out = sympy.collect(var_out, cur_symbol)
     return var_out
-    
+
 
 def simplify_coeffs(variable, variable_list):
     rest = copy.copy(variable)
@@ -92,7 +92,7 @@ def simplify_coeffs(variable, variable_list):
     out += rest
     return out
 
-    
+
 def list_collect_v1(row, listin):
     rowout = copy.copy(row)
     for c, item in enumerate(rowout):
@@ -140,12 +140,12 @@ def matrix_subs(M, sub_dict):
         out_list[r] = row
     outmat = sympy.Matrix(out_list)
     return outmat
-        
-    
+
+
 def matrix_collect_v1(M, listin):
     temp = copy.copy(M)
     out_list = temp.tolist()
-    
+
     for r, row in enumerate(out_list):
         row_out = list_collect(row, listin)
         out_list[r] = row_out
@@ -164,7 +164,7 @@ def matrix_simplify(M):
 def matrix_collect(M, listin):
     return matrix_func(M, collect_multiple, listin)
 
-    
+
 def declare_many_sims(listin, namespace=globals()):
     for sym in listin:
         cmd = '%s = sympy.Symbol("%s")' % (sym, sym)
@@ -206,7 +206,7 @@ class equation(object):
         new_rhs = sympy.expand(self.rhs)
         new_eq = equation(new_lhs, new_rhs)
         return new_eq
-    
+
     def ToLatex(self, *args, **kwargs):
         profile = {'mode':'plain'}
         lhsstr = sympy.latex(self.lhs, profile)

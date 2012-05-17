@@ -5,7 +5,7 @@ import pylab as PL
 
 import os
 
-from IPython.Debugger import Pdb
+from IPython.core.debugger import Pdb
 
 
 def _get_fig(fi=None):
@@ -33,7 +33,7 @@ def _build_pdf_path(pathin):
     pdfpath = fno + '.pdf'
     return pdfpath
 
-    
+
 def mysave(path_in, fi=None, ext='.eps', dpi=100, pdfcrop=1):
     myfig = _get_fig(fi)
     mplutil.mysave(path_in, myfig, ext=ext, dpi=dpi)
@@ -44,7 +44,7 @@ def mysave(path_in, fi=None, ext='.eps', dpi=100, pdfcrop=1):
             print(cmd)
             os.system(cmd)
 
-    
+
 
 
 def plot_cols(t, mat, fi=1, clear=True, leg=None, ylabel=None, \
@@ -82,12 +82,12 @@ def set_ylabel(ylabel, fi=1):
 def set_xlabel(xlabel, fi=1):
     PL.figure(fi)
     PL.xlabel(xlabel)
-    
+
 def Increase_YLim(ypos, yneg=None, fi=None):
     ax = _get_first_axis(fi)
     mplutil.Increase_YLim(ax, ypos, yneg)
 
-    
+
 def my_plot(x, y, fi=1, clear=True, leg=None, ylabel=None, \
               xlabel='Time (sec)', legloc=1, ylim=[], xlim=[], \
               **kwargs):
@@ -105,12 +105,12 @@ def my_plot(x, y, fi=1, clear=True, leg=None, ylabel=None, \
         PL.ylim(ylim)
     if xlim:
         PL.xlim(xlim)
-    
+
 
 def SetTitle(fignum, title, axis=0):
     fig = PL.figure(fignum)
     mplutil.SetTitle(fig, title, axis=axis)
-    
+
 
 def SetAllXlims(fi, xlim):
     fig = _get_fig(fi)
@@ -126,10 +126,10 @@ def SetYlim(fi, ylim):
     fig = _get_fig(fi)
     mplutil.SetYlim(fig, ylim)
 
-    
+
 def SetFreqLim(fi, xlim):
     SetAllXlims(fi, xlim)
-    
+
 ## def SetMagLim(fi, maglim, axis=None):
 ##     fig = _get_fig(fi)
 ##     mplutil.SetMagLim(fig, maglim, axis)

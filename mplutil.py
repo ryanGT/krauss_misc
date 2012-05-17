@@ -7,7 +7,7 @@ it should also replace rwkmplutil."""
 from __future__ import division
 import matplotlib, os
 from numpy import column_stack
-from IPython.Debugger import Pdb
+from IPython.core.debugger import Pdb
 
 
 def subplot212(fig, x, y1, y2, xlabel='Time (sec)', y1label=None, y2label=None, legend1=[], legend2=[]):
@@ -130,12 +130,12 @@ def SetYLim(fig, ylim, axis=0):
 
 def SetYTicks(fig, ticks, axis=0):
     fig.axes[axis].set_yticks(ticks)
-    
+
 
 def SetTitle(fig, title, axis=0):
     fig.axes[axis].set_title(title)
-    
-    
+
+
 def Increase_YLim(ax, ypos, yneg=None):
     if yneg is None:
         yneg = ypos
@@ -161,7 +161,7 @@ def SetLegend(fig, legend_list=None, axis=0, loc=3):
         axis = 0
     elif axis == 312:
         axis = 1
-    elif axis == 313:        
+    elif axis == 313:
         axis = 2
     #print('axis=%s' % axis)
     if legend_list is not None:
@@ -248,10 +248,10 @@ def set_Bode_opts(fig, bodeopts, coh=True):
                 value = defaults[attr]
         if value:
             func(fig, value)
-            
-        
 
-    
+
+
+
 #from pylab import figure, subplot, yticks, xticks, ylabel, xlabel, title, semilogx, gca
 
 ## def SetPlotLims(fi,myxlim, ylim1,ylim2=[]):
@@ -328,7 +328,7 @@ def mysave(path_in, fig, ext='.eps', dpi=100):
     if ext[0] != '.':
         ext = '.'+ext
     path_no_ext, ext_in = os.path.splitext(path_in)
-    if ext_in: 
+    if ext_in:
         ext = ext_in
     kwargs = {}
     if ext == '.pdf':
@@ -341,7 +341,7 @@ def mysave(path_in, fig, ext='.eps', dpi=100):
         cmd = 'epstopdf %s' % path_out
         print('cmd='+cmd)
         os.system(cmd)
-        
+
 
 ## def MagLegend(fi,legend,legloc):
 ##     """Place the legend of fi on the magnitude portion of Bode plot by
@@ -356,7 +356,7 @@ def mysave(path_in, fig, ext='.eps', dpi=100):
 ## def SetLegend(fi,legend,legloc,subplotnum=None):
 ##     """Set the legend of figure fi at location legloc.  If subplotnum
 ##     is specified, call subplot(subplotnum) before calling legend.
-    
+
 ##     legloc follows standard pylab notation:
 ##     1-Upper Right
 ##     2-Upper Left
@@ -425,7 +425,7 @@ def mysave(path_in, fig, ext='.eps', dpi=100):
 ##             mylist=x
 ##             for curx in mylist:
 ##                 myvline(curx, linetype, linewidth, mysub=sub)
-        
+
 ## def DropBottomYtick(fi, subp=None):
 ##     figure(fi)
 ##     if subp:

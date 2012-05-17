@@ -2,7 +2,7 @@ import glob, os, sys
 
 import txt_mixin
 
-from IPython.Debugger import Pdb
+from IPython.core.debugger import Pdb
 
 def find_pathout(glob_pat):
     first, last = glob_pat.split('$',1)

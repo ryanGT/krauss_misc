@@ -1,13 +1,13 @@
 import os, copy, sys, glob, time, re
 import pdb
 import shutil
-#from  IPython.Debugger import Pdb
+from IPython.core.debugger import Pdb
 
 def delete_from_glob_pat(pat):
     myfiles = glob.glob(pat)
     for curpath in myfiles:
         os.remove(curpath)
-        
+
 
 def epstopdfpath(epspath):
     pne, ext = os.path.splitext(epspath)
@@ -21,7 +21,7 @@ def get_home():
         home_dir = home_dir.replace('/','\\')#just making sure there
                                              #are no '/'
     return home_dir
-    
+
 def split_list_of_paths(pathlist):
     names = []
     folders = []
@@ -41,7 +41,7 @@ def clean_filename(pathin):
     out = re.sub('\W','_', fno)
     out = re.sub('_+', '_', out)
     return os.path.join(folder, out+ext)
-    
+
 
 def splittolist(pathstr):
     listout = pathstr.split(os.sep)
@@ -130,7 +130,7 @@ def checklower(pathin, folder=None):
         return mylist[ind]
     else:
         return None
-        
+
 
 def FindFullPath(relpath, basepaths=['Z:\\','D:\\','C:\\ryan','C:\\','E:\\']):
     outpath=''
@@ -190,7 +190,7 @@ def CopyFromPath(filename,desfolder):
         return True
     else:
         return False
-        
+
 def amiLinux():
     platstr=sys.platform
     platstr=platstr.lower()
@@ -199,7 +199,7 @@ def amiLinux():
     else:
         return 0
 
-    
+
 def find_dirs(path, hidden=False, returnrel=True):
     pattern = os.path.join(path,'*')
     myfiles=glob.glob(pattern)
@@ -227,7 +227,7 @@ def write_unison_sync_files(searchpath,outfile):
     f.writelines(mylist)
     f.close()
     return mylist
-    
+
 
 def FilterOutDirs(pathin, skipdirs=[]):
     if not skipdirs:
@@ -324,8 +324,8 @@ def get_new_file_number(pat, destdir, startnum=1, endnum=10000):
         temp = pat % i
         if not os.path.exists(os.path.join(destdir, temp)):
             return i
-        
-    
+
+
 def get_unique_name(pathin, destdir, fmt='%0.4d', startnum=1, \
                     forcenum=False):
     if startnum is None:
@@ -421,7 +421,7 @@ def walk_copy_folders(root1, root2, \
         print('copyfolders is False, this is just a practice')
         print('')
         print('='*10)
-        
+
     for root, dirs, files in os.walk(root1):
         temppath, foldername = os.path.split(root)
         if foldername not in skipdirs:

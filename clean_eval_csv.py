@@ -3,7 +3,7 @@ import glob, os, sys, cPickle, re
 
 import txt_mixin
 
-from IPython.Debugger import Pdb
+from IPython.core.debugger import Pdb
 
 def O_replace(match):
     return match.group(1)+'0'+match.group(2)
@@ -61,7 +61,7 @@ class Eval_Base(txt_mixin.txt_file_with_list):
         header = txt_mixin.txt_file_with_list(header_path)
         self.full_latex = header.list + self.latex + ['\\end{document}']
 
-        
+
 
     def Save_Latex(self):
         if not hasattr(self, 'latex'):
@@ -96,7 +96,7 @@ class Course_Report(Eval_Base):
         if not hasattr(self,'latex'):
             self.latex = []
         self.latex.append('\\input{%s}' % lne)
-        
+
 
     def latex_append(self, line):
         if not hasattr(self,'latex'):
@@ -108,7 +108,7 @@ class Course_Report(Eval_Base):
         if not hasattr(self,'latex'):
             self.latex = []
         self.latex.extend(listin)
-        
+
 
 class Eval_CSV(Eval_Base):
     def clean_O_and_S(self):
@@ -116,7 +116,7 @@ class Eval_CSV(Eval_Base):
         self.replaceall('"O"','0')
         pat1 = '"([0-9S\.]*)O([0-9S\.]*)"'
         pat2 = pat1.replace('S','')
-        pat2 = pat2.replace('O','S')        
+        pat2 = pat2.replace('O','S')
         self.replaceallre(pat1, O_replace)
         self.replaceallre(pat2, S_replace)
 
@@ -130,7 +130,7 @@ class Eval_CSV(Eval_Base):
         pat = '"([0-9SO\.]+)"'
         print('calling tricky_replacer')
         self.replaceallre(pat, tricky_replacer)
-        
+
 
     def clean_leading_blanks(self, pat='^[;, ]*'):
         self.replaceallre(pat, '')
@@ -216,7 +216,7 @@ class stats_data(object):
             if cur_n != N:
                 print('Problem with length of '+key+':')
                 print('   len('+key+')='+str(cur_n))
-                
+
 
     def process_raw(self, datain=None):
         if datain is not None:
@@ -226,7 +226,7 @@ class stats_data(object):
         N = len(self.size)
         self.inds = range(1,N+1)
         self.check_lengths()
-        
+
 
     def call_funcs(self):
         for key in self.keys:
@@ -252,9 +252,9 @@ class stats_data(object):
         mypkl.close()
         for key, val in mydict.iteritems():
             setattr(self, key, val)
-        
-        
-            
+
+
+
 ##  ['"Sample Size",38,38,38',
 ##   '"Number Missing",1,1,1',
 ##   '"Mean",4.05,4.82,3.11',
@@ -313,16 +313,16 @@ class Stats_CSV(Eval_CSV):
 
         if not hasattr(self, 'end_inds'):
             self.find_inds_for_data()
-            
+
         self.data = []
-        
+
         for start, end in zip(self.start_inds, self.end_inds):
             curdata = self.list[start:end+1]
             #"Total Valid" needs a blank cell next to it
             temp = txt_mixin.txt_list(curdata)
             self.data.append(temp)
         return self.data
-        
+
 
     def Process_Data(self):
         if not hasattr(self, 'data'):
@@ -358,7 +358,7 @@ class Stats_CSV(Eval_CSV):
             return '\\begin{tabular}{p{2.75in}*{5}{r}}'
         else:
             return '\\begin{tabular}{p{2.75in}*{4}{r}}'
-    
+
 
     def _latex_label_format(self, labels, fstr='\\textbf'):
         flist = [fstr+'{'+item+'}' for item in labels]
@@ -372,7 +372,7 @@ class Stats_CSV(Eval_CSV):
         ext = tex_list.extend
 
         #ext(self.Fancy_Header())
-        
+
         out('')
         out('\\flushleft')
         out('')
@@ -386,7 +386,7 @@ class Stats_CSV(Eval_CSV):
                 if not self.variance:
                     labels0.pop(4)
                     labels1.pop(4)
-                
+
                 #labels = ['Question', 'Mean', 'Sample Size', \
                 #          'Number Missing', 'Variance', \
                 #          'Standard Deviation']
@@ -437,9 +437,9 @@ class Item_Analysis_CSV(Stats_CSV):
     def Get_Data(self):
         if not hasattr(self, 'label_inds'):
             self.find_inds_for_data()
-            
+
         self.data = []
-        
+
         for start, end in zip(self.label_inds, self.total_inds):
             curdata = self.list[start:end+1]
             #"Total Valid" needs a blank cell next to it
@@ -449,8 +449,8 @@ class Item_Analysis_CSV(Stats_CSV):
                 temp[ind] = temp[ind].replace('"Total Valid"','"Total Valid",')
             self.data.append(temp)
         return self.data
-        
-        
+
+
     def Build_Pretty_Data(self):
         if not hasattr(self, 'data'):
             self.Get_Data()
@@ -464,7 +464,7 @@ class Item_Analysis_CSV(Stats_CSV):
             self.pretty_data.append(formatted_title)
             self.pretty_data.extend(curdata)
             self.pretty_data.append('')
-            
+
 
     def Save_Data(self):
         fno, ext = os.path.splitext(self.pathin)
@@ -494,7 +494,7 @@ class Item_Analysis_CSV(Stats_CSV):
         list_out = [item.replace('>','$>$') for item in list_out]
         list_out = [item.replace('&','\&') for item in list_out]
         return list_out
-    
+
 
     def _latex_label_format_list(self, labels, fstr='\\textbf'):
         flist = [fstr+'{'+item+'}' for item in labels]
@@ -504,9 +504,9 @@ class Item_Analysis_CSV(Stats_CSV):
         flist = self._latex_label_format_list(labels, fstr=fstr)
         label_str_out = ' & '.join(flist)+ ' \\\\'
         return label_str_out
-    
 
-    
+
+
     def _latex_one_chunk(self, data, title, ind):
         tex_list = []
         out = tex_list.append
@@ -517,7 +517,7 @@ class Item_Analysis_CSV(Stats_CSV):
         labels = self._row_str_to_list(data.pop(0))
         labels = [item.replace('"','') for item in labels]
         n = len(labels)-1
-        
+
         out('\\begin{tabular}{l*{%i}{r}}'%n)
         out('\\hline')
 
@@ -534,7 +534,7 @@ class Item_Analysis_CSV(Stats_CSV):
         out('\\hline')
 
         i = 0
-        
+
         for row in data:
             row_list = self._row_str_to_list(row)
             clean_list = self._clean_row(row_list)
@@ -544,27 +544,27 @@ class Item_Analysis_CSV(Stats_CSV):
                 out('\\rowcolor[gray]{0.9}')
             if i == 5:
                 out('\\hline')
-            
+
         out('\\end{tabular}')
         out('}')#end parbox
         out('\\vspace{0.3in}')
         return tex_list
-            
+
 
 
     def Build_Latex(self):
         tex_list = []
         out = tex_list.append
         ext = tex_list.extend
-        
+
         i = 0
-        
+
         out('')
         out('\\flushleft')
         out('')
 
         Pdb().set_trace()
-        
+
         for title, curdata in zip(item_titles, self.data):
             i += 1
             cur_list = self._latex_one_chunk(curdata, title, i)
@@ -573,7 +573,7 @@ class Item_Analysis_CSV(Stats_CSV):
             out('')
             #if (i % 4 == 0):
             #    out('\\pagebreak')
-                
+
         self.latex = tex_list
 
 
@@ -621,7 +621,7 @@ class Comments_TXT(Item_Analysis_CSV):
 
     def _item_out(self, item):
         self.latex.append('\\item '+item)
-        
+
 
     def Build_Latex(self):
         self.clean_comments()
@@ -647,11 +647,11 @@ class Comments_TXT(Item_Analysis_CSV):
                 self._item_out(item)
             out('\\end{itemize}')
         out('\\end{enumerate}')
-        
-        
+
+
 if __name__ == '__main__':
     myCSV = Stats_CSV('/home/ryan/siue/tenure/student_evaluations/ME356_S07_stats.csv')
     pathout = myCSV.Run()
     print('pathout='+pathout)
     myCSV.Get_Data()
-    
+

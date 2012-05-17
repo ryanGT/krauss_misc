@@ -1,6 +1,6 @@
 import glob, os
 
-from  IPython.Debugger import Pdb
+from IPython.core.debugger import Pdb
 
 def findall(topdir, pat, walk=True, includetop=1):
     if includetop:
@@ -16,4 +16,4 @@ def findall(topdir, pat, walk=True, includetop=1):
                 curfiles = glob.glob(curpat)
                 myfiles.extend(curfiles)
     return myfiles
-            
+
