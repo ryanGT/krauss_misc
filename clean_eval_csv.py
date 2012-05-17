@@ -562,6 +562,9 @@ class Item_Analysis_CSV(Stats_CSV):
         out('')
         out('\\flushleft')
         out('')
+
+        Pdb().set_trace()
+        
         for title, curdata in zip(item_titles, self.data):
             i += 1
             cur_list = self._latex_one_chunk(curdata, title, i)

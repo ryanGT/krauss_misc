@@ -49,8 +49,13 @@ def mysave(path_in, fi=None, ext='.eps', dpi=100, pdfcrop=1):
 
 def plot_cols(t, mat, fi=1, clear=True, leg=None, ylabel=None, \
               xlabel='Time (sec)', legloc=1, ylim=[], xlim=[], \
+              figsize=None, \
               **kwargs):
-    PL.figure(fi)
+    if figsize is not None:
+        PL.figure(fi, figsize)
+    else:
+        PL.figure(fi)
+
     if clear:
         PL.clf()
     nr, nc = mat.shape
