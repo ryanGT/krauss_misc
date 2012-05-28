@@ -106,6 +106,41 @@ class object_that_saves(object):
         self.set_attrs(mydict)
 
 
+class gui_that_saves(object_that_saves):
+    """This class suplements object_that_saves by appyling it to guis
+    where there will be different methods associated with getting and
+    setting each parameter in the dictionary of saved properties."""
+    def _initialize_saving(self):
+        """Because this is intended to be a mixin class, it doesn't
+        really have a true __init__ method.  This method serves that
+        purposed by creating the empty dictionaries for get and set
+        methods."""
+        self.get_dict = {}
+        self.set_dict = {}
+        self.saveattrs = []
+
+
+    def append_item(self, key, get_method, set_method):
+        self.get_dict[key] = get_method
+        self.set_dict[key] = set_method
+        self.saveattrs.append(key)
+        
+
+    def build_dict(self):
+        mydict = {}
+        for attr in self.saveattrs:
+            get_method = self.get_dict[attr]
+            val = get_method()
+            mydict[attr] = val
+        return mydict
+
+
+    def set_attrs(self, mydict):
+        for attr, val in mydict.iteritems():
+            set_method = self.set_dict[attr]
+            set_method(val)
+            
+
 def load_from_pickle(filename, key):
     mydict = LoadPickle(filename)
     return mydict[key]
