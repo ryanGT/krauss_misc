@@ -7,6 +7,8 @@ Linux = rwkos.amiLinux()
 
 import tkFileDialog
 
+autosave_dir = '/home/ryan/gimpautosave/'
+
 home = rwkos.get_home()
 lecturerc_name = 'pygimp_lecturerc.pkl'
 lecturerc_path = os.path.join(home, lecturerc_name)
@@ -259,18 +261,44 @@ def get_slide_num_filename_2010(myint=None):
     new_name = pat % new_ind
     return new_name, new_ind
 
+
+def _valid_filename(curname, full_pat):
+    if curname.find(full_pat) == 0:
+        return True
+    elif curname.find(autosave_dir) == 0:
+        #this is an autosaved image we are trying to recover
+        autosave_folder, autosaved_name = os.path.split(curname)
+        lecture_folder, short_pat = os.path.split(full_pat)
+        if autosaved_name.find(short_pat) == 0:
+            return True
+        else:
+            return False
+        
+
+def _is_recovery_file(curname):
+    if curname.find(autosave_dir) == 0:
+        return True
+    else:
+        return False
+    
     
 def save_all_slides():
     img_list = gimp.image_list()
     N = len(img_list)
+    
     print('img_list = ' + str(img_list))
-    #Pdb.set_trace()
     mydict = open_pickle()
     full_pat = os.path.join(mydict['lecture_path'], mydict['search_pat'])
     success = True
     for img in img_list:
         curname = img.filename
-        if curname and curname.find(full_pat) == 0:
+        if _is_recovery_file(curname):
+            print('this is a recovery file')
+            #force the image to be dirty
+            img.layers[0].visible = False
+            img.layers[0].visible = True
+
+        if curname and _valid_filename(curname, full_pat):
             if pdb.gimp_image_is_dirty(img):
                 out = my_save_2010(img)
                 if not out:
@@ -315,8 +343,13 @@ def my_save_2010(img, drawable=None):
     search_folder = os.path.join(folder, search_pat)
     #Test 1
     if path1.find(search_folder) != 0:
-        print('problem with filename: ' + path1)
-        return False
+        if path1.find(autosave_dir) == 0:
+            junk, filename = os.path.split(path1)
+            path1 = os.path.join(folder, filename)
+            print('setting path1 to ' + path1)
+        else:
+            print('problem with filename: ' + path1)
+            return False
 
     #Test 2
     myint = get_notes_layer_slide_num(img)
