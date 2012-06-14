@@ -1,5 +1,6 @@
 import os, re
 import basic_file_ops
+from numpy import array, zeros, ones
 
 class txt_file(object):
     def readfile(self, pathin, strip=False, rstrip=True):
@@ -57,6 +58,16 @@ class txt_list(list):
         else:
             return linenums
 
+
+    def _find_boolvect(self, pattern, *args, **kwargs):
+        """Just like _find, but return a boolvect of matching items
+        rather than just the indices of matches."""
+        inds = self._find(pattern, *args, **kwargs)
+        N = len(self)
+        bool_vect = zeros(N, dtype=bool)
+        bool_vect[inds] = True
+        return bool_vect
+        
 
     def find(self, pattern, **kwargs):
         out = self._find(pattern, **kwargs)

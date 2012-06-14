@@ -1,7 +1,22 @@
 from numpy import *
 import misc_utils
+import numpy
 
 class txt_database(object):
+    def search_attr_exact_match(self, attr, match):
+        """retrieve attr using getattr(self, attr) and then find
+        where(attr==match)[0].  Return the vector of boolean values
+        for matching.  If match is an empty string, return a vector of
+        all Trues."""
+        vect = getattr(self, attr)
+        if match == '':
+            N = len(vect)
+            bool_vect = ones(N, dtype=bool)
+        else:
+            bool_vect = vect==match
+        return bool_vect
+
+    
     def _empty_strings_to_0(self, vect):
         """Replace all empty strings with '0' so that they can be
         converted to floats."""
@@ -84,6 +99,21 @@ class txt_database(object):
             
             
 
+    def add_new_row(self, key, key_label, new_dict):
+        key_col_ind = self.col_inds[key_label]
+        key_col = self.data[:,key_col_ind]
+        match_inds = where(key_col==key)[0]
+        assert len(match_inds) == 0, "Attempting to add a new row with a key that already exists: " + str(key)
+        nr, nc = self.data.shape
+        new_list = ['']*nc
+        for key, val in new_dict.iteritems():
+            key_col_ind = self.col_inds[key]
+            new_list[key_col_ind] = str(val)
+            
+        new_row = array([new_list])
+        self.data = numpy.append(self.data, new_row, axis=0)
+        
+        
     def __init__(self, pathin, delim='\t'):
         data = loadtxt(pathin,dtype=str,delimiter=delim)
         self.labels = data[0,:]
