@@ -244,7 +244,13 @@ class txt_list(list):
         return mycount
         
     
+class txt_list_lowercase(txt_list):
+    def __init__(self, listin, *args, **kwargs):
+        lower_list = [item.lower() for item in listin]
+        txt_list.__init__(self, lower_list, *args, **kwargs)
 
+                 
+    
 default_map = ['findall', 'findallre', 'findprevious', \
                'findnext', 'replaceall', 'findnextblank', \
                'replaceallre', 'append','extend', \

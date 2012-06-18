@@ -1,6 +1,7 @@
 from numpy import *
 import misc_utils
 import numpy
+import copy
 
 class txt_database(object):
     def search_attr_exact_match(self, attr, match):
@@ -82,6 +83,22 @@ class txt_database(object):
         return delim
 
 
+    def get_row(self, key, key_label):
+        key_col_ind = self.col_inds[key_label]
+        key_col = self.data[:,key_col_ind]
+        match_inds = where(key_col==key)[0]
+        assert len(match_inds) > 0, "Did not find a match for " + key
+        assert len(match_inds) == 1, "Found more than one match for key " + key
+        row_ind = match_inds[0]
+        return self.data[row_ind,:]
+
+
+    def get_row_dict(self, key, key_label):
+        row_data = self.get_row(key, key_label)
+        mydict = dict(zip(self.labels, row_data))
+        return mydict
+    
+
     def update_one_row(self, key, key_label, update_dict):
         """Determine the correct row by search for key in the column
         whose labels is key_label.  Within that row, update the
@@ -114,10 +131,9 @@ class txt_database(object):
         self.data = numpy.append(self.data, new_row, axis=0)
         
         
-    def __init__(self, pathin, delim='\t'):
-        data = loadtxt(pathin,dtype=str,delimiter=delim)
-        self.labels = data[0,:]
-        self.data = data[1:,:]
+    def __init__(self, data, labels):
+        self.data = data
+        self.labels = labels
         self.N_cols = len(self.labels)
         inds = range(self.N_cols)
         self.col_inds = dict(zip(self.labels, inds))
@@ -128,3 +144,24 @@ class txt_database(object):
     def save(self, pathout, delim='\t'):
         misc_utils.dump_matrix(pathout, self.data, self.labels, \
                                fmt='%s', delim=delim)
+
+
+
+    def filter(self, boolvect):
+        filt_data = copy.copy(self.data[boolvect])
+        new_db = txt_database(filt_data, self.labels)
+        return new_db
+            
+        
+
+def _open_txt_file(pathin, delim='\t'):
+    alldata = loadtxt(pathin,dtype=str,delimiter=delim)
+    labels = alldata[0,:]
+    data = alldata[1:]
+    return data, labels
+
+def db_from_file(pathin, delim='\t'):
+    data, labels = _open_txt_file(pathin, delim)
+    mydb = txt_database(data, labels)
+    return mydb
+                       
