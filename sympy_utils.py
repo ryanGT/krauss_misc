@@ -1,7 +1,7 @@
 from scipy import *
 import sympy
 import copy, re
-from IPython.core.debugger import Pdb
+#from IPython.core.debugger import Pdb
 import pdb
 
 def expr_to_Maxima_string(expr):
@@ -134,7 +134,6 @@ def matrix_subs(M, sub_dict):
     out_list = temp.tolist()
     for r, row in enumerate(out_list):
         for i, item in enumerate(row):
-            Pdb().set_trace()
             item_out = item.subs(sub_dict)
             row[i] = item_out
         out_list[r] = row

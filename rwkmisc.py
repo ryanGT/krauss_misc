@@ -1,10 +1,11 @@
 # rwk misc module
 
-import scipy, copy
+import scipy, numpy, copy
 import time
 import os, glob, re, sys
+from numpy import *
 
-from IPython.core.debugger import Pdb
+#from IPython.core.debugger import Pdb
 #mytrace=Pdb().set_trace
 
 import cPickle
@@ -503,6 +504,21 @@ def rowwise(matin,makecopy=1):
 #            if imag(ent):
 #                rstr=__printent(real(ent),width=width)
 
+def cleannum(value, eps=1e-14):
+    if numpy.abs(value) < eps:
+        return 0
+    elif abs(numpy.real(value)) < eps:
+        return 1.0j*imag(value)
+    elif abs(numpy.imag(value)) < eps:
+        return numpy.real(value)
+    
+
+def prettyvect(vect,fmt='%0.5g',eps=1e-14):
+    filtvect = [cleannum(item,eps) for item in vect]
+    strlist = [fmt % item for item in filtvect]
+    str1 = ', '.join(strlist)
+    str2 = '[' + str1 + ']'
+    return str2
 
 
 def prettymat(mat,fmt='%0.5g',eps=1e-14):

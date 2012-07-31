@@ -8,7 +8,7 @@ from __future__ import division
 import matplotlib, os
 from numpy import column_stack
 
-from IPython.core.debugger import Pdb
+#from IPython.core.debugger import Pdb
 
 
 def subplot212(fig, x, y1, y2, xlabel='Time (sec)', y1label=None, y2label=None, legend1=[], legend2=[]):

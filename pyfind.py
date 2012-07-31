@@ -1,6 +1,6 @@
 import glob, os
 
-from IPython.core.debugger import Pdb
+#from IPython.core.debugger import Pdb
 
 def findall(topdir, pat, walk=True, includetop=1):
     if includetop:

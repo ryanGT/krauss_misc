@@ -87,8 +87,8 @@ class txt_database(object):
         key_col_ind = self.col_inds[key_label]
         key_col = self.data[:,key_col_ind]
         match_inds = where(key_col==key)[0]
-        assert len(match_inds) > 0, "Did not find a match for " + key
-        assert len(match_inds) == 1, "Found more than one match for key " + key
+        assert len(match_inds) > 0, "Did not find a match for " + str(key)
+        assert len(match_inds) == 1, "Found more than one match for key " + str(key)
         row_ind = match_inds[0]
         return self.data[row_ind,:]
 

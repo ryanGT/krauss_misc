@@ -5,7 +5,7 @@ import pylab as PL
 
 import os
 
-from IPython.core.debugger import Pdb
+#from IPython.core.debugger import Pdb
 
 
 def _get_fig(fi=None):

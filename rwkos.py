@@ -1,7 +1,7 @@
 import os, copy, sys, glob, time, re
 import pdb
 import shutil
-from IPython.core.debugger import Pdb
+#from IPython.core.debugger import Pdb
 
 def delete_from_glob_pat(pat):
     myfiles = glob.glob(pat)
