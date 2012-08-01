@@ -22,7 +22,18 @@ def _save_labels(f, labels, delim='\t'):
     firstrow = delim.join(labels)#create a delimited first row of the labels
     f.write(firstrow+'\n')#write the first row and a line feed to the file
     return f
-    
+
+def _save_comments(f, comments):
+    if comments:
+        if type(comments) == str:
+            comments = [comments]
+        for line in comments:
+            if line[0] != '#':
+                line = '#' + line
+            f.write(line + '\n')
+    return f
+
+
 def dump_vectors(filename, vectorlist, labels, fmt='%0.10g', delim='\t'):
     """Dump a list of vectors to a text file where each vector is a
     columnm in a spreadsheet style text file.
@@ -44,11 +55,13 @@ def dump_vectors(filename, vectorlist, labels, fmt='%0.10g', delim='\t'):
     f.close()#close the file
 
     
-def dump_matrix(filename, matrix, labels, fmt='%0.10g', delim='\t'):
+def dump_matrix(filename, matrix, labels, fmt='%0.10g', delim='\t', \
+                comments=None):
     """Similar to dump_vectors, but the data is already a matrix that
     needs to be dumped to a file with a lable row."""
     f = _open_file(filename)
     _save_labels(f, labels, delim=delim)
+    _save_comments(f,comments)
     _dump_matrix(f, matrix, fmt=fmt, delim=delim)
     f.close()#close the file
 
