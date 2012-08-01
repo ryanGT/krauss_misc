@@ -18,7 +18,12 @@ def _open_file(filename):
     return f
 
 
-def _save_labels(f, labels, delim='\t'):
+def _save_labels(f, labels, delim='\t', comment_labels=False):
+    if comment_labels:
+        first_label = labels[0]
+        if first_label[0] != '#':
+            labels[0] = '#' + first_label
+            
     firstrow = delim.join(labels)#create a delimited first row of the labels
     f.write(firstrow+'\n')#write the first row and a line feed to the file
     return f
@@ -51,19 +56,19 @@ def dump_vectors(filename, vectorlist, labels, fmt='%0.10g', delim='\t', \
     delim is the delimiter to use between columns of the file.  The
     default is a tab."""
     f = _open_file(filename)
-    _save_labels(f, labels, delim=delim)
-    _save_comments(f,comments)    
+    _save_comments(f,comments)
+    _save_labels(f, labels, delim=delim, comment_labels=comment_labels)
     _dump_vectors(f, vectorlist, fmt=fmt, delim=delim)
     f.close()#close the file
 
     
 def dump_matrix(filename, matrix, labels, fmt='%0.10g', delim='\t', \
-                comments=None):
+                comments=None, comment_labels=False):
     """Similar to dump_vectors, but the data is already a matrix that
     needs to be dumped to a file with a lable row."""
     f = _open_file(filename)
-    _save_labels(f, labels, delim=delim)
     _save_comments(f,comments)
+    _save_labels(f, labels, delim=delim, comment_labels=comment_labels)
     _dump_matrix(f, matrix, fmt=fmt, delim=delim)
     f.close()#close the file
 
