@@ -34,7 +34,8 @@ def _save_comments(f, comments):
     return f
 
 
-def dump_vectors(filename, vectorlist, labels, fmt='%0.10g', delim='\t'):
+def dump_vectors(filename, vectorlist, labels, fmt='%0.10g', delim='\t', \
+                 comments=None):
     """Dump a list of vectors to a text file where each vector is a
     columnm in a spreadsheet style text file.
 
@@ -51,6 +52,7 @@ def dump_vectors(filename, vectorlist, labels, fmt='%0.10g', delim='\t'):
     default is a tab."""
     f = _open_file(filename)
     _save_labels(f, labels, delim=delim)
+    _save_comments(f,comments)    
     _dump_vectors(f, vectorlist, fmt=fmt, delim=delim)
     f.close()#close the file
 
