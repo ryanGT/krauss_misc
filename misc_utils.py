@@ -40,7 +40,7 @@ def _save_comments(f, comments):
 
 
 def dump_vectors(filename, vectorlist, labels, fmt='%0.10g', delim='\t', \
-                 comments=None):
+                 comments=None, comment_labels=False):
     """Dump a list of vectors to a text file where each vector is a
     columnm in a spreadsheet style text file.
 
