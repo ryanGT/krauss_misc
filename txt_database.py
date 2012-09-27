@@ -3,6 +3,10 @@ import misc_utils
 import numpy
 import copy
 
+import txt_mixin
+
+#from IPython.core.debugger import Pdb
+
 class txt_database(object):
     def search_attr_exact_match(self, attr, match):
         """retrieve attr using getattr(self, attr) and then find
@@ -27,6 +31,8 @@ class txt_database(object):
 
 
     def convert_cols_to_float(self, collabels):
+        if type(collabels) == str:
+            collabels = [collabels]
         for col in collabels:
             if hasattr(self, col):
                 myvect = getattr(self, col)
@@ -83,13 +89,18 @@ class txt_database(object):
         return delim
 
 
-    def get_row(self, key, key_label):
+    def get_ind(self, key, key_label):
         key_col_ind = self.col_inds[key_label]
         key_col = self.data[:,key_col_ind]
         match_inds = where(key_col==key)[0]
         assert len(match_inds) > 0, "Did not find a match for " + str(key)
         assert len(match_inds) == 1, "Found more than one match for key " + str(key)
         row_ind = match_inds[0]
+        return row_ind
+    
+
+    def get_row(self, key, key_label):
+        row_ind = self.get_ind(key, key_label)
         return self.data[row_ind,:]
 
 
@@ -155,10 +166,13 @@ class txt_database(object):
         
 
 def _open_txt_file(pathin, delim='\t'):
-    alldata = loadtxt(pathin,dtype=str,delimiter=delim)
+    myfile = txt_mixin.delimited_txt_file(pathin, delim=delim)
+    #alldata = loadtxt(pathin,dtype=str,delimiter=delim)
+    alldata = myfile.array
     labels = alldata[0,:]
     data = alldata[1:]
     return data, labels
+
 
 def db_from_file(pathin, delim='\t'):
     data, labels = _open_txt_file(pathin, delim)

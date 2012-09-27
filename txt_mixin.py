@@ -297,8 +297,24 @@ class txt_file_with_list(txt_file):
         self.refresh_list_map()
             
 
-                                         
 
+class delimited_txt_file(txt_file_with_list):
+    def break_list(self):
+        nested_list = []
+        for line in self.list:
+            curlist = line.split(self.delim)
+            nested_list.append(curlist)
+            
+        self.nested_list = nested_list
+        return self.nested_list
+    
+        
+    def __init__(self, pathin=None, list_map=default_map, delim='\t'):
+        txt_file_with_list.__init__(self, pathin, list_map=list_map)
+        self.delim = delim
+        self.break_list()
+        self.array = array(self.nested_list)
+        
 
 def dump(filename, listin):
     myfile = txt_file()

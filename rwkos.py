@@ -134,6 +134,8 @@ def checklower(pathin, folder=None):
 
 def FindFullPath(relpath, basepaths=['Z:\\','D:\\','C:\\ryan','C:\\','E:\\']):
     outpath=''
+    if os.path.exists(relpath):
+        return os.path.abspath(relpath)
     #print('relpath='+str(relpath))
     if amiLinux():
         homedir = os.path.expanduser('~')
@@ -376,9 +378,10 @@ def make_dirs_recrusive(dir_path):
     """Split dir_path in to a list and make each dir in the tree that
     doesn't already exist."""
     sep = os.path.sep
-    mylist = dir_path.split(sep)
     if amiLinux():
         curroot = '/'
+        dir_path = os.path.expanduser(dir_path)
+    mylist = dir_path.split(sep)
     while not mylist[0]:
         mylist.pop(0)
     for folder in mylist:
