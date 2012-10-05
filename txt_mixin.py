@@ -316,6 +316,22 @@ class delimited_txt_file(txt_file_with_list):
         self.array = array(self.nested_list)
         
 
+    def save(self, pathout, array=None, delim=None):
+        if delim is None:
+            delim = self.delim
+        if array is None:
+            array = self.array
+
+        outlist = []
+        
+        for row in array:
+            row_str = delim.join(row)
+            outlist.append(row_str)
+            
+
+        dump(pathout, outlist)
+
+             
 def dump(filename, listin):
     myfile = txt_file()
     myfile.writefile(filename, listin)
