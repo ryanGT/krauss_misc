@@ -1,9 +1,11 @@
 # rwk misc module
 
-import scipy, numpy, copy
+import scipy, numpy
 import time
 import os, glob, re, sys
 from numpy import *
+
+import copy
 
 #from IPython.core.debugger import Pdb
 #mytrace=Pdb().set_trace
