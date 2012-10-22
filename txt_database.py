@@ -166,6 +166,8 @@ class txt_database(object):
         
 
 def _open_txt_file(pathin, delim='\t'):
+    import pdb
+    pdb.set_trace()
     myfile = txt_mixin.delimited_txt_file(pathin, delim=delim)
     #alldata = loadtxt(pathin,dtype=str,delimiter=delim)
     alldata = myfile.array
