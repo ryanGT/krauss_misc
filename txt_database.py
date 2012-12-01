@@ -3,7 +3,7 @@ import misc_utils
 import numpy
 import copy
 
-import txt_mixin
+import txt_mixin, delimited_file_utils
 
 #from IPython.core.debugger import Pdb
 
@@ -166,11 +166,12 @@ class txt_database(object):
         
 
 def _open_txt_file(pathin, delim='\t'):
-    import pdb
-    pdb.set_trace()
-    myfile = txt_mixin.delimited_txt_file(pathin, delim=delim)
+    #import pdb
+    #pdb.set_trace()
+    #myfile = txt_mixin.delimited_txt_file(pathin, delim=delim)
     #alldata = loadtxt(pathin,dtype=str,delimiter=delim)
-    alldata = myfile.array
+    #alldata = myfile.array
+    alldata = delimited_file_utils.open_delimited_with_sniffer_and_check(pathin)
     labels = alldata[0,:]
     data = alldata[1:]
     return data, labels
