@@ -117,6 +117,11 @@ def SetAllXlims(fi, xlim):
     mplutil.SetAllXlims(fig, xlim)
 
 
+def SetXTicks(fi, xlim):
+    fig = _get_fig(fi)
+    mplutil.SetXTicks(fig, xlim)
+
+
 def SetXlim(fi, xlim):
     fig = _get_fig(fi)
     mplutil.SetXlim(fig, xlim)

@@ -1,6 +1,7 @@
 import os, re
 import basic_file_ops
 from numpy import array, zeros, ones
+from delimited_file_utils import open_delimited_with_sniffer_and_check
 
 class txt_file(object):
     def readfile(self, pathin, strip=False, rstrip=True):
@@ -312,8 +313,9 @@ class delimited_txt_file(txt_file_with_list):
     def __init__(self, pathin=None, list_map=default_map, delim='\t'):
         txt_file_with_list.__init__(self, pathin, list_map=list_map)
         self.delim = delim
-        self.break_list()
-        self.array = array(self.nested_list)
+        self.break_list()#<-- eventually, this could probably be eliminated
+        #self.array = array(self.nested_list)
+        self.array = open_delimited_with_sniffer_and_check(pathin)#<-- new stuff
         
 
     def save(self, pathout, array=None, delim=None):

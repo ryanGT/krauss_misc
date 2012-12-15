@@ -42,9 +42,20 @@ def SetAllXlims(fig, xlim):
     for axis in fig.axes:
         axis.set_xlim(xlim)
 
+
 def SetXlim(fig, xlim):
     """alias for SetAllXlims"""
     return SetAllXlims(fig, xlim)
+
+
+def SetAllXTicks(fig, ticks):
+    for axis in fig.axes:
+        axis.set_xticks(ticks)
+    
+    
+def SetXTicks(fig, ticks):
+    """alias for SetAllXTicks"""
+    SetAllXTicks(fig, ticks)
 
 
 def SetYlim(fig, ylim, axis=0):
@@ -131,7 +142,7 @@ def SetYLim(fig, ylim, axis=0):
 
 def SetYTicks(fig, ticks, axis=0):
     fig.axes[axis].set_yticks(ticks)
-
+    
 
 def SetTitle(fig, title, axis=0):
     fig.axes[axis].set_title(title)
