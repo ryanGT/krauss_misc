@@ -46,7 +46,10 @@ def sniff(pathin, bytes=1000):
         delim = ','
         dialect = mycsv
     else:
-        dialect = mysniff.sniff(mystr, delim)
+        try:
+            dialect = mysniff.sniff(mystr)
+        except:
+            dialect = tabdelim#<-- sort of punting here, could be dangerous
     return dialect
 
     
