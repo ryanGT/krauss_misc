@@ -52,11 +52,31 @@ def sniff(pathin, bytes=1000):
             dialect = tabdelim#<-- sort of punting here, could be dangerous
     return dialect
 
+
+def _open_delimited(pathin, dialect):
+    reader = csv.reader(open(pathin,'rb'), dialect)
+    alllines = [row for row in reader]
+    return alllines
+
     
 def open_delimited_with_sniffer(pathin):
     dialect = sniff(pathin)
-    reader = csv.reader(open(pathin,'rb'), dialect)
-    alllines = [row for row in reader]
+    alllines = _open_delimited(pathin, dialect)
+    return alllines
+
+
+def open_delimited_dialect(pathin, dialect=None, delim=None):
+    """delim can be used to specify dialect.  Do not specifiy delim if
+    you are also specifying dialect, since delim not equal to None
+    overrides dialect."""
+    if delim is not None:
+        if delim == ',':
+            dialect = mycsv
+        elif delim == '\t':
+            dialect = tabdelim
+        else:
+            raise ValueError, "Not sure what to do with delimiter %s" % delim
+    alllines = _open_delimited(pathin, dialect)
     return alllines
 
 

@@ -339,6 +339,19 @@ def dump(filename, listin):
     myfile.writefile(filename, listin)
 
 
+def _row_to_spreadsheet_string(row, fmt='%s', delim='\t'):
+    list_of_strs = [fmt % item for item in row]
+    row_str = delim.join(list_of_strs)
+    return row_str
+
+
+def dump_delimited(filename, array, delim='\t', fmt='%s'):
+    """Convert an array or a nested list to list of delimited row
+    strings and then pass that list to the regular dump function."""
+    list_of_rows = [_row_to_spreadsheet_string(item, fmt=fmt, delim=delim) for item in array]
+    dump(filename, list_of_rows)
+
+
 def read(filename):
     myfile = txt_file()
     out = myfile.readfile(filename)
