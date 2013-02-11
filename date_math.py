@@ -199,7 +199,15 @@ def _get_days_one_week(start_day=None):
     end_day = start_day + datetime.timedelta(days=delta)
     start_int = start_day.day
     end_int = end_day.day
-    mylist = range(start_int, end_int+1)
+    if start_int > end_int:
+        #we have crossed from one month into another
+        end_month = find_end_day()
+        end_month_int = end_month.day
+        list1 = range(start_int, end_month_int+1)
+        list2 = range(1, end_int+1)
+        mylist = list1 + list2
+    else:
+        mylist = range(start_int, end_int+1)
     return mylist
 
 

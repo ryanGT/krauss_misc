@@ -124,7 +124,7 @@ class pickle_entry(object):
         curtext = label + ":"
         Tkinter.Label(mw, text=curtext).grid(row=row, column=0, sticky='e')
         self.entry = Tkinter.Entry(mw, textvariable=self.var, \
-                                   width=75)  
+                                   width=25)  
         self.entry.grid(row=row, column=1)
 
 
@@ -167,7 +167,7 @@ class lecture_pickle_dialog:#(tkSimpleDialog.Dialog):
         self.result = None
         self.mw = Tkinter.Tk()
         self.mw.option_add("*font", ("Arial", 15, "normal"))
-        self.mw.geometry("+600+300")
+        self.mw.geometry("+400+300")
         self.labels = ['Lecture Path', 'Course Num.', \
                        'Search Pattern', 'Date Stamp', \
                        'Pat', 'Current Slide', \
