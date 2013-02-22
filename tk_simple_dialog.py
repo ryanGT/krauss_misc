@@ -235,6 +235,11 @@ class reset_lecture_dialog:#(tkSimpleDialog.Dialog):
 
     def reset_outline(self):
         self.pickle['outline_slide'] = 0
+        clear_list = ['outline_pat','outline_dir']
+        for key in clear_list:
+            if self.pickle.has_key(key):
+                self.pickle.pop(key)
+
 
 
     def _build_pat(self, end='*'):
