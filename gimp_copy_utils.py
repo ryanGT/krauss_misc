@@ -36,13 +36,15 @@ def scale_image(img, max_w, max_h, debug=0):
 
 
 def copy_img2_to_img(img2, img, x_offset=None, y_offset=None, \
-                     autocrop=True):
+                     autocrop=True, x_margin=50, y_margin=None):
+    if y_margin is None:
+        y_margin = x_margin
     if autocrop:
         pdb.plug_in_autocrop(img2, img2.layers[0])
     w = img.width
-    max_w = w-50
+    max_w = w-x_margin
     h = img.height
-    max_h = h-50
+    max_h = h-y_margin
     if x_offset is not None:
         max_w -= x_offset
     if y_offset is not None:
@@ -90,8 +92,8 @@ def copy_jpg_to_img(jpg_path, img, x_offset=None, y_offset=None, \
 
 
 def copy_png_to_img(png_path, img, x_offset=None, y_offset=None, \
-                    autocrop=True):
+                    autocrop=True, **kwargs):
     img2 = pdb.gimp_file_load(png_path, png_path)
     return copy_img2_to_img(img2, img, x_offset=x_offset, y_offset=y_offset, \
-                            autocrop=autocrop)
+                            autocrop=autocrop, **kwargs)
 
