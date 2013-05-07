@@ -7,6 +7,14 @@ import txt_mixin, delimited_file_utils
 
 #from IPython.core.debugger import Pdb
 
+def label_to_attr_name(label):
+    illegal_chars = [' ',':','/','\\']
+    attr = label
+    for char in illegal_chars:
+        attr = attr.replace(char, '_')
+    return attr
+
+
 class txt_database(object):
     def search_attr_exact_match(self, attr, match):
         """retrieve attr using getattr(self, attr) and then find
@@ -51,17 +59,14 @@ class txt_database(object):
                 myint = myfloat.astype(int)
                 setattr(self, col, myint)
 
-                
+
 
     def _col_labels_to_attr_names(self):
         """Replace any spaces or other illegal characters in the
         column labels to make them into legal attr names."""
-        illegal_chars = [' ',':','/','\\']
         attr_names = []
         for label in self.labels:
-            attr = label
-            for char in illegal_chars:
-                attr = attr.replace(char, '_')
+            attr = label_to_attr_name(label)
             attr_names.append(attr)
         self.attr_names = attr_names
         self.label_attr_dict = dict(zip(self.attr_names, self.labels))
@@ -140,7 +145,22 @@ class txt_database(object):
             
         new_row = array([new_list])
         self.data = numpy.append(self.data, new_row, axis=0)
+
+
+    def add_new_column(self, col_data, label):
+        new_data = column_stack([self.data,col_data])
+        new_labels = numpy.append(self.labels, label)
+        self.data = new_data
+        self.labels = new_labels
+        nr, nc = new_data.shape
+        new_col_num = nc - 1
+        attr = label_to_attr_name(label)
+        self.attr_names.append(attr)
+        setattr(self, attr, col_data)
+        self.label_attr_dict[attr] = label
+        self.col_attr_dict[attr] = new_col_num
         
+
         
     def __init__(self, data, labels):
         self.data = data

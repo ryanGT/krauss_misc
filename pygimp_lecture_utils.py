@@ -1,4 +1,4 @@
-import os, rwkos, rwkmisc, re, time
+import os, rwkos, rwkpickle, re, time
 import pdb as Pdb
 
 from gimpfu import *
@@ -7,7 +7,7 @@ Linux = rwkos.amiLinux()
 
 import tkFileDialog
 
-autosave_dir = '/home/ryan/gimpautosave/'
+autosave_dir = 'gimpautosave'
 
 home = rwkos.get_home()
 lecturerc_name = 'pygimp_lecturerc.pkl'
@@ -132,24 +132,24 @@ def set_lecture_path(pathin=None):
     #log_msg('------')
     #log_msg('in set_lecture_path')
     if os.path.exists(lecturerc_path):
-        mydict = rwkmisc.LoadPickle(lecturerc_path)
+        mydict = rwkpickle.LoadPickle(lecturerc_path)
     else:
         mydict = {}
     if pathin is None:
         pathin = find_lecture_path()
     mydict['lecture_path'] = pathin
     #log_msg('setting lecture_path to %s' % mydict['lecture_path'])
-    rwkmisc.SavePickle(mydict, lecturerc_path)
+    rwkpickle.SavePickle(mydict, lecturerc_path)
     return mydict['lecture_path']
 
 
 def open_pickle():
-    mydict = rwkmisc.LoadPickle(lecturerc_path)
+    mydict = rwkpickle.LoadPickle(lecturerc_path)
     return mydict
 
 
 def save_pickle(mydict):
-    rwkmisc.SavePickle(mydict, lecturerc_path)
+    rwkpickle.SavePickle(mydict, lecturerc_path)
 
     
 def folder_from_pickle():
@@ -159,7 +159,7 @@ def folder_from_pickle():
 
 def get_path_from_pkl():
     if os.path.exists(lecturerc_path):
-        mydict = rwkmisc.LoadPickle(lecturerc_path)
+        mydict = rwkpickle.LoadPickle(lecturerc_path)
         loaded_path = mydict['lecture_path']
         #log_msg('loading path from pickle: %s' % loaded_path)
         return loaded_path

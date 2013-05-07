@@ -2,11 +2,11 @@
 
 import Tkinter
 import tkMessageBox
-import rwkmisc, rwkos, os, glob
+import rwkpickle, rwkos, os, glob
 
 from Tkinter import StringVar, IntVar, DoubleVar
 
-pklpath = '/home/ryan/pygimp_lecturerc.pkl'
+pklpath = rwkos.FindFullPath('pygimp_lecturerc.pkl')
 
 class myWindow:
     def close(self, *args, **kwargs):
@@ -159,11 +159,11 @@ class lecture_pickle_dialog:#(tkSimpleDialog.Dialog):
 
 
     def save_pickle(self):
-        rwkmisc.SavePickle(self.pickle, pklpath)
+        rwkpickle.SavePickle(self.pickle, pklpath)
         
 
     def __init__(self, title="Lecture Pickle Dialog"):
-        self.pickle = rwkmisc.LoadPickle(pklpath)        
+        self.pickle = rwkpickle.LoadPickle(pklpath)        
         self.result = None
         self.mw = Tkinter.Tk()
         self.mw.option_add("*font", ("Arial", 15, "normal"))
@@ -229,7 +229,7 @@ class reset_lecture_dialog:#(tkSimpleDialog.Dialog):
         if self.var2.get():
             print('deleting existing slides')
             self.delete_existing_slides()
-        rwkmisc.SavePickle(self.pickle, pklpath)
+        rwkpickle.SavePickle(self.pickle, pklpath)
         self.mw.destroy()
 
 
@@ -267,7 +267,7 @@ class reset_lecture_dialog:#(tkSimpleDialog.Dialog):
         self.mw.option_add("*font", ("Arial", 15, "normal"))
         self.mw.geometry("+300+300")
 
-        self.pickle = rwkmisc.LoadPickle(pklpath)
+        self.pickle = rwkpickle.LoadPickle(pklpath)
 
         #Need to display the number of existing slides and the
         #current outline slide number

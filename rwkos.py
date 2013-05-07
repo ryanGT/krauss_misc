@@ -17,7 +17,7 @@ def epstopdfpath(epspath):
 def get_home():
     """Get the users home directory on either windows or linux."""
     home_dir = os.getenv('HOME') or os.getenv('USERPROFILE')
-    if not amiLinux():
+    if not (amiLinux() or amiMac()):
         home_dir = home_dir.replace('/','\\')#just making sure there
                                              #are no '/'
     return home_dir
@@ -87,7 +87,7 @@ def makerel(fullpath):
     way."""
     #user_name = os.getlogin()#apparently, this doesn't work in windows
     myhome = get_home()
-    if amiLinux():
+    if amiLinux() or amiMac():
         user_name = os.getlogin()
         fullpath = fullpath.replace('\\','/')
     else:
@@ -137,7 +137,15 @@ def FindFullPath(relpath, basepaths=['Z:\\','D:\\','C:\\ryan','C:\\','E:\\']):
     if os.path.exists(relpath):
         return os.path.abspath(relpath)
     #print('relpath='+str(relpath))
-    if amiLinux():
+    if amiMac():
+        ryan = '/home/ryan'
+    if relpath.find(ryan) == 0:
+        rest = relpath[len(ryan):]
+        if rest[0] == '/':
+            rest = rest[1:]
+        relpath = rest
+    
+    if amiLinux() or amiMac():
         homedir = os.path.expanduser('~')
         basepaths = [homedir]
         import socket
@@ -201,6 +209,13 @@ def amiLinux():
     else:
         return 0
 
+def amiMac():
+    platstr = sys.platform
+    platstr=platstr.lower()
+    if platstr.find('darwin') > -1:
+        return 1
+    else:
+        return 0
 
 def find_dirs(path, hidden=False, returnrel=True):
     pattern = os.path.join(path,'*')
@@ -378,9 +393,10 @@ def make_dirs_recrusive(dir_path):
     """Split dir_path in to a list and make each dir in the tree that
     doesn't already exist."""
     sep = os.path.sep
-    if amiLinux():
+    if amiLinux() or amiMac():
         curroot = '/'
         dir_path = os.path.expanduser(dir_path)
+    print('dir_path = ' + dir_path)
     mylist = dir_path.split(sep)
     while not mylist[0]:
         mylist.pop(0)

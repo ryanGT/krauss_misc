@@ -1,7 +1,7 @@
 import os, re
 import basic_file_ops
-from numpy import array, zeros, ones
-from delimited_file_utils import open_delimited_with_sniffer_and_check
+#from numpy import array, zeros, ones
+
 
 class txt_file(object):
     def readfile(self, pathin, strip=False, rstrip=True):
@@ -63,6 +63,7 @@ class txt_list(list):
     def _find_boolvect(self, pattern, *args, **kwargs):
         """Just like _find, but return a boolvect of matching items
         rather than just the indices of matches."""
+        from scipy import zeros
         inds = self._find(pattern, *args, **kwargs)
         N = len(self)
         bool_vect = zeros(N, dtype=bool)
@@ -311,6 +312,7 @@ class delimited_txt_file(txt_file_with_list):
     
         
     def __init__(self, pathin=None, list_map=default_map, delim='\t'):
+        from delimited_file_utils import open_delimited_with_sniffer_and_check
         txt_file_with_list.__init__(self, pathin, list_map=list_map)
         self.delim = delim
         self.break_list()#<-- eventually, this could probably be eliminated
