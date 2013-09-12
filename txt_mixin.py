@@ -347,11 +347,14 @@ def _row_to_spreadsheet_string(row, fmt='%s', delim='\t'):
     return row_str
 
 
-def dump_delimited(filename, array, delim='\t', fmt='%s'):
+def dump_delimited(filename, array, delim='\t', fmt='%s', labels=[]):
     """Convert an array or a nested list to list of delimited row
     strings and then pass that list to the regular dump function."""
     list_of_rows = [_row_to_spreadsheet_string(item, fmt=fmt, delim=delim) \
                     for item in array]
+    if labels:
+        label_row_str = _row_to_spreadsheet_string(labels, fmt='%s', delim=delim)
+        list_of_rows = [label_row_str] + list_of_rows
     dump(filename, list_of_rows)
 
 
