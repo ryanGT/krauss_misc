@@ -57,11 +57,14 @@ def get_num_params(params, sys_num_params):
     return params_out
 
 
-def try_string_to_float(string_in):
+def try_string_to_number(string_in):
     try:
-        myout = float(string_in)
+        myout = int(string_in)
     except:
-        myout = string_in
+        try:
+            myout = float(string_in)
+        except:
+            myout = string_in
     return myout
 
 pat1 = r"u'(.*)'"
@@ -79,6 +82,19 @@ def clean_unicode(string_in):
     return string_in
 
 
+def clean_extra_quotes(string_in):
+    string0 = string_in.strip()
+    if string0[0] == '"':
+        string0 = string0[1:]
+    if string0[0] == "'":
+        string0 = string0[1:]
+    if string0[-1] == '"':
+        string0 = string0[0:-1]
+    if string0[-1] == "'":
+        string0 = string0[0:-1]
+    return string0
+
+
 def list_string_to_list(string_in):
     string0 = string_in.strip()
     if string0[0] == '[':
@@ -89,9 +105,10 @@ def list_string_to_list(string_in):
     mylist = string0.split(',')
     #solve problems with unicode strings that match the pattern with u'name'
     mylist00 = [clean_unicode(item) for item in mylist]
-    mylist0 = [label.encode() for label in mylist00]
+    mylist00A = [clean_extra_quotes(item) for item in mylist00]
+    mylist0 = [label.encode() for label in mylist00A]
     mylist2 = [label.strip() for label in mylist0]
-    mylist3 = [try_string_to_float(item) for item in mylist2]
+    mylist3 = [try_string_to_number(item) for item in mylist2]
     return mylist3
 
 
@@ -101,17 +118,19 @@ def dict_string_to_dict(string_in):
         string0 = string0[1:]
     if string0[-1] == '}':
         string0 = string0[0:-1]
-    dict_list = string_in.split(',')
+    dict_list = string0.split(',')
     dict_out = {}
 
     for cur_str in dict_list:
         key, val = cur_str.split(':',1)
         key = key.strip()
         key = clean_unicode(key)
+        key = clean_extra_quotes(key)
         val = val.strip()
         val = clean_unicode(val)
+        val = clean_extra_quotes(val)
         val = val.replace('\\\\','\\')
-        dict_out[key] = try_string_to_float(val)
+        dict_out[key] = try_string_to_number(val)
 
     return dict_out
 
