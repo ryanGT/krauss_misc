@@ -3,6 +3,62 @@ from xml.dom import minidom
 
 import re
 
+def try_string_to_number(string_in):
+    try:
+        myout = int(string_in)
+    except:
+        try:
+            myout = float(string_in)
+        except:
+            myout = string_in
+    return myout
+
+pat1 = r"^u'(.+?)'"
+pat2 = r'^u"(.+?)"'
+p_quote1 = re.compile(pat1)
+p_quote2 = re.compile(pat2)
+
+def clean_unicode(string_in):
+    q1 = p_quote1.search(string_in)
+    if q1:
+        return q1.group(1)
+    q2 = p_quote2.search(string_in)
+    if q2:
+        return q2.group()
+    return string_in
+
+
+def clean_extra_quotes(string_in):
+    string0 = string_in.strip()
+    if not string0:
+        return string0
+    if string0[0] == '"':
+        string0 = string0[1:]
+    if string0[0] == "'":
+        string0 = string0[1:]
+    if string0[-1] == '"':
+        string0 = string0[0:-1]
+    if string0[-1] == "'":
+        string0 = string0[0:-1]
+    return string0
+
+
+def clean_none_string(string_in):
+    if string_in == 'None':
+        return None
+    else:
+        return string_in
+
+
+def full_clean(string_in):
+    #print('string_in = %s' % string_in)
+    string_out = clean_unicode(string_in)
+    string_out = clean_extra_quotes(string_out)
+    string_out = clean_none_string(string_out)
+    #print('string_out = %s' % string_out)
+    return string_out
+
+
 def prettify(elem):
     """Return a pretty-printed XML string for the Element.
     """
@@ -30,7 +86,9 @@ def children_to_dict(element):
     mydict = {}
     for child in element.getchildren():
         key = child.tag.strip()
+        key = full_clean(key)
         val = child.text.strip()
+        val = full_clean(val)
         mydict[key] = val
     return mydict
 
@@ -57,42 +115,6 @@ def get_num_params(params, sys_num_params):
     return params_out
 
 
-def try_string_to_number(string_in):
-    try:
-        myout = int(string_in)
-    except:
-        try:
-            myout = float(string_in)
-        except:
-            myout = string_in
-    return myout
-
-pat1 = r"u'(.*)'"
-pat2 = r'u"(.*)"'
-p_quote1 = re.compile(pat1)
-p_quote2 = re.compile(pat2)
-
-def clean_unicode(string_in):
-    q1 = p_quote1.search(string_in)
-    if q1:
-        return q1.group(1)
-    q2 = p_quote2.search(string_in)
-    if q2:
-        return q2.group()
-    return string_in
-
-
-def clean_extra_quotes(string_in):
-    string0 = string_in.strip()
-    if string0[0] == '"':
-        string0 = string0[1:]
-    if string0[0] == "'":
-        string0 = string0[1:]
-    if string0[-1] == '"':
-        string0 = string0[0:-1]
-    if string0[-1] == "'":
-        string0 = string0[0:-1]
-    return string0
 
 
 def list_string_to_list(string_in):
@@ -104,9 +126,10 @@ def list_string_to_list(string_in):
     
     mylist = string0.split(',')
     #solve problems with unicode strings that match the pattern with u'name'
-    mylist00 = [clean_unicode(item) for item in mylist]
-    mylist00A = [clean_extra_quotes(item) for item in mylist00]
-    mylist0 = [label.encode() for label in mylist00A]
+    #mylist00 = [clean_unicode(item) for item in mylist]
+    #mylist00A = [clean_extra_quotes(item) for item in mylist00]
+    mylist00 = [full_clean(item) for item in mylist]
+    mylist0 = [label.encode() for label in mylist00]
     mylist2 = [label.strip() for label in mylist0]
     mylist3 = [try_string_to_number(item) for item in mylist2]
     return mylist3
@@ -124,11 +147,13 @@ def dict_string_to_dict(string_in):
     for cur_str in dict_list:
         key, val = cur_str.split(':',1)
         key = key.strip()
-        key = clean_unicode(key)
-        key = clean_extra_quotes(key)
+        key = full_clean(key)
+        ## key = clean_unicode(key)
+        ## key = clean_extra_quotes(key)
         val = val.strip()
-        val = clean_unicode(val)
-        val = clean_extra_quotes(val)
+        ## val = clean_unicode(val)
+        ## val = clean_extra_quotes(val)
+        val = full_clean(val)
         val = val.replace('\\\\','\\')
         dict_out[key] = try_string_to_number(val)
 
@@ -163,9 +188,14 @@ class xml_writer(object):
 
 
 class xml_parser(object):
-    def __init__(self, filename):
+    def __init__(self, filename=None):
         self.filename = filename
-        self.tree = ET.parse(filename)
-        self.root = self.tree.getroot()
+        if self.filename is not None:
+            self.tree = ET.parse(filename)
+            self.root = self.tree.getroot()
+
+
+    def set_root(self, root):
+        self.root = root
 
 
