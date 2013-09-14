@@ -1,7 +1,7 @@
 import xml.etree.ElementTree as ET
 from xml.dom import minidom
 
-import re
+import re, pdb
 
 def try_string_to_number(string_in):
     try:
@@ -52,7 +52,8 @@ def clean_none_string(string_in):
 
 def full_clean(string_in):
     #print('string_in = %s' % string_in)
-    string_out = clean_unicode(string_in)
+    string_out = string_in.strip()
+    string_out = clean_unicode(string_out)
     string_out = clean_extra_quotes(string_out)
     string_out = clean_none_string(string_out)
     #print('string_out = %s' % string_out)
@@ -82,6 +83,14 @@ def find_child(element, name):
               (name, element.getchildren())
 
 
+def find_child_if_it_exists(element, name):
+    try:
+        child = find_child(element, name)
+        return child
+    except ValueError:
+        return None
+
+    
 def children_to_dict(element):
     mydict = {}
     for child in element.getchildren():
@@ -118,6 +127,7 @@ def get_num_params(params, sys_num_params):
 
 
 def list_string_to_list(string_in):
+    #print('string_in = ' + str(string_in))
     string0 = string_in.strip()
     if string0[0] == '[':
         string0 = string0[1:]
@@ -132,6 +142,10 @@ def list_string_to_list(string_in):
     mylist0 = [label.encode() for label in mylist00]
     mylist2 = [label.strip() for label in mylist0]
     mylist3 = [try_string_to_number(item) for item in mylist2]
+    ## print('items out:')
+    ## for item in mylist3:
+    ##     print(item)
+
     return mylist3
 
 
@@ -148,6 +162,8 @@ def dict_string_to_dict(string_in):
         key, val = cur_str.split(':',1)
         key = key.strip()
         key = full_clean(key)
+        if key == 'selected_inds':
+            pdb.set_trace()
         ## key = clean_unicode(key)
         ## key = clean_extra_quotes(key)
         val = val.strip()
