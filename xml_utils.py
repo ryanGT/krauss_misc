@@ -1,9 +1,69 @@
+"""
+Main Classes
+++++++++++++++++
+
+This module provides two main classes and many helper functions.  The main classes are
+
+1. :py:class:`xml_writer` is a base class for objects that will save themselves to XML files.
+2. :py:class:`xml_parser` is a base class for loading and parsing XML files.
+
+Autodoc Content
++++++++++++++++++++
+"""
+
 import xml.etree.ElementTree as ET
 from xml.dom import minidom
 
 import re, pdb
 
+
+class xml_writer(object):
+    """This is intended to be a base class for saving an instance of
+    the object to an xml file.  Each derived class must define a
+    string :py:attr:`self.xml_tag_name` and a list
+    :py:attr:`self.xml_attrs` before the create_xml method is called.
+    """
+    def create_xml(self, root):
+        """If a derived class does not override
+        :py:meth:`xml_writer.create_xml`, for each element in
+        :py:attr:`self.xml_attrs` a SubElement will be created with
+        the name of the attr and the text for the SubElement element
+        will be str(getattr(self, attr)).
+
+        The tag name for the XML SubElement will be
+        :py:attr:`self.xml_tag_name`."""
+        my_elem = ET.SubElement(root, self.xml_tag_name)
+        for attr in self.xml_attrs:
+            cur_xml = ET.SubElement(my_elem, attr)
+            attr_str = str(getattr(self, attr))
+            cur_xml.text = attr_str.encode()
+
+
+class xml_parser(object):
+    """This is a base for XML parsers.  If the user does not pass in a
+    filename at initialization, then they must call
+    :py:meth:`xml_parser.set_root` before parsing.  This should allow
+    using the same parser for a too-level object or as part of a
+    larger object.  I use this approach with data_vis_gui; a figure
+    parser can parse a figure XML file or be used for the figure
+    portion of a larger full GUI state XML file. """
+    def __init__(self, filename=None):
+        self.filename = filename
+        if self.filename is not None:
+            self.tree = ET.parse(filename)
+            self.root = self.tree.getroot()
+
+
+    def set_root(self, root):
+        self.root = root
+
+
+
+
 def try_string_to_number(string_in):
+    """This function attempts to convert a string to either an integer
+    or a float.  If both conversions fail, the string is simply
+    returned unmodified."""
     try:
         myout = int(string_in)
     except:
@@ -19,6 +79,11 @@ p_quote1 = re.compile(pat1)
 p_quote2 = re.compile(pat2)
 
 def clean_unicode(string_in):
+    """I had some initial problems with strings saving as u'theta' and
+    this is my attempt to fix that.  When reading the xml, I ended up with "u'theta'".
+    I also tried to solve this problem by making sure I encoded the
+    strings before saving them.  This problem was coming from the unicode version of wxPython
+    and using the GetValue method of text controls."""
     q1 = p_quote1.search(string_in)
     if q1:
         return q1.group(1)
@@ -29,6 +94,7 @@ def clean_unicode(string_in):
 
 
 def clean_extra_quotes(string_in):
+    """Strip extra quotes from the beginning and ending of strings."""
     string0 = string_in.strip()
     if not string0:
         return string0
@@ -44,6 +110,7 @@ def clean_extra_quotes(string_in):
 
 
 def clean_none_string(string_in):
+    """Replace 'None' with the actual None"""
     if string_in == 'None':
         return None
     else:
@@ -51,6 +118,7 @@ def clean_none_string(string_in):
 
 
 def full_clean(string_in):
+    """Call of my string cleaning functions in order"""
     #print('string_in = %s' % string_in)
     string_out = string_in.strip()
     string_out = clean_unicode(string_out)
@@ -62,6 +130,8 @@ def full_clean(string_in):
 
 def prettify(elem):
     """Return a pretty-printed XML string for the Element.
+
+    This function does successive indenting of the XML tree
     """
     rough_string = ET.tostring(elem, 'utf-8')
     reparsed = minidom.parseString(rough_string)
@@ -70,6 +140,7 @@ def prettify(elem):
 
 
 def find_child(element, name):
+    """find a child of an XML element by name; raise an exception if it isn't found"""
     found = 0
     for child in element.getchildren():
         if child.tag == name:
@@ -84,6 +155,8 @@ def find_child(element, name):
 
 
 def find_child_if_it_exists(element, name):
+    """try searching for a child by name; return None rather than
+    raising an exception if the child isn't found"""
     try:
         child = find_child(element, name)
         return child
@@ -92,6 +165,9 @@ def find_child_if_it_exists(element, name):
 
     
 def children_to_dict(element):
+    """Convert the children of the element to a dictionary; the tag
+    names are the key and the text of the element children are the
+    values."""
     mydict = {}
     for child in element.getchildren():
         key = child.tag.strip()
@@ -103,12 +179,18 @@ def children_to_dict(element):
 
 
 def get_params(element):
+    """search for a child node called 'params' and convert it to a
+    dictionary"""
     params_xml = find_child(element, 'params')
     params = children_to_dict(params_xml)
     return params
 
 
 def get_num_params(params, sys_num_params):
+    """Require all parameters to be converted to float; each parameter
+    must either be converted by the float function or the val must be
+    a key in sys_num_params so that sys_num_params[val] returns a
+    number."""
     params_out = {}
 
     for key, val in params.iteritems():
@@ -127,6 +209,7 @@ def get_num_params(params, sys_num_params):
 
 
 def list_string_to_list(string_in):
+    """Convert a string such as '[1,2,3]' to an actual list instance"""
     #print('string_in = ' + str(string_in))
     string0 = string_in.strip()
     if string0[0] == '[':
@@ -150,6 +233,8 @@ def list_string_to_list(string_in):
 
 
 def dict_string_to_dict(string_in):
+    """Convert a string such as '{'a':1, 'b':3}' to an actual
+    dictionary instance"""
     string0 = string_in.strip()
     if string0[0] == '{':
         string0 = string0[1:]
@@ -177,6 +262,8 @@ def dict_string_to_dict(string_in):
 
 
 def write_pretty_xml(root, xmlpath):
+    """Write the XML of root to xmlpath after passing it through
+    :py:func:`prettify`"""
     pretty_str = prettify(root)
     f = open(xmlpath, 'wb')
     f.write(pretty_str)
@@ -184,34 +271,9 @@ def write_pretty_xml(root, xmlpath):
 
 
 def append_dict_to_xml(root, dict_in):
+    """for each key:val pair in dict_in, create a SubElement with tag
+    name key and text val"""
     for key, val in dict_in.iteritems():
         val_xml = ET.SubElement(root, key)
         val_xml.text = val
-
-
-class xml_writer(object):
-    """This is intended to be a base class for saving an instance of
-    the object to an xml file.  Each derived class must define a
-    string self.xml_tag_name and a list self.xml_attrs before the
-    create_xml method is called.
-    """
-    def create_xml(self, root):
-        my_elem = ET.SubElement(root, self.xml_tag_name)
-        for attr in self.xml_attrs:
-            cur_xml = ET.SubElement(my_elem, attr)
-            attr_str = str(getattr(self, attr))
-            cur_xml.text = attr_str.encode()
-
-
-class xml_parser(object):
-    def __init__(self, filename=None):
-        self.filename = filename
-        if self.filename is not None:
-            self.tree = ET.parse(filename)
-            self.root = self.tree.getroot()
-
-
-    def set_root(self, root):
-        self.root = root
-
 
