@@ -121,6 +121,10 @@ def full_clean(string_in):
     """Call of my string cleaning functions in order"""
     #print('string_in = %s' % string_in)
     string_out = string_in.strip()
+    if string_out[0] == '[' and string_out[-1] == ']':
+        return list_string_to_list(string_out)
+    elif string_out[0] == '{' and string_out[-1] == '}':
+        return dict_string_to_dict(string_out)
     string_out = clean_unicode(string_out)
     string_out = clean_extra_quotes(string_out)
     string_out = clean_none_string(string_out)
