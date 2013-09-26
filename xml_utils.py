@@ -38,6 +38,8 @@ class xml_writer(object):
             attr_str = str(getattr(self, attr))
             cur_xml.text = attr_str.encode()
 
+        return my_elem
+    
 
 class xml_parser(object):
     """This is a base for XML parsers.  If the user does not pass in a
@@ -73,10 +75,12 @@ def try_string_to_number(string_in):
             myout = string_in
     return myout
 
+
 pat1 = r"^u'(.+?)'"
 pat2 = r'^u"(.+?)"'
 p_quote1 = re.compile(pat1)
 p_quote2 = re.compile(pat2)
+
 
 def clean_unicode(string_in):
     """I had some initial problems with strings saving as u'theta' and
@@ -180,6 +184,13 @@ def children_to_dict(element):
         val = full_clean(val)
         mydict[key] = val
     return mydict
+
+
+def get_child_value(element, name):
+    child = find_child(element, name)
+    val = child.text.strip()
+    val = full_clean(val)
+    return val
 
 
 def get_params(element):
