@@ -292,3 +292,11 @@ def append_dict_to_xml(root, dict_in):
         val_xml = ET.SubElement(root, key)
         val_xml.text = val
 
+
+def str_to_bool(str_in):
+    if str_in.lower() == 'false':
+        return False
+    elif str_in.lower() == 'true':
+        return True
+    else:
+        raise ValueError, 'Cannot convert this string to a bool: %s' % str_in
