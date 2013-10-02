@@ -121,6 +121,16 @@ def clean_none_string(string_in):
         return string_in
 
 
+def clean_extra_backslashes(string_in):
+    """XML saving and loading of string with latex code can lead to
+    things like $\\\\theta$.  I want to search and replace the \\\\
+    for \\ if the string starts and ends with $"""
+    string_out = string_in.strip()
+    if string_out[0] == '$' and string_out[-1] == '$':
+        #we have a valid candidate
+        string_out = string_out.replace('\\\\','\\')
+    return string_out
+
 def full_clean(string_in):
     """Call of my string cleaning functions in order"""
     #print('string_in = %s' % string_in)
@@ -131,6 +141,7 @@ def full_clean(string_in):
         return dict_string_to_dict(string_out)
     string_out = clean_unicode(string_out)
     string_out = clean_extra_quotes(string_out)
+    string_out = clean_extra_backslashes(string_out)
     string_out = clean_none_string(string_out)
     #print('string_out = %s' % string_out)
     return string_out
