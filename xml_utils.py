@@ -131,14 +131,19 @@ def clean_extra_backslashes(string_in):
         string_out = string_out.replace('\\\\','\\')
     return string_out
 
+
 def full_clean(string_in):
     """Call of my string cleaning functions in order"""
     #print('string_in = %s' % string_in)
     if string_in is None:
         return string_in
-    elif type(string_in) != str:
+    elif type(string_in) == unicode:
+        string_in = string_in.encode()
+    elif type(string_in) not in [str, unicode]:
         return string_in
     string_out = string_in.strip()
+    if not string_out:
+        return string_out
     if string_out[0] == '[' and string_out[-1] == ']':
         return list_string_to_list(string_out)
     elif string_out[0] == '{' and string_out[-1] == '}':
