@@ -34,9 +34,10 @@ class xml_writer(object):
         :py:attr:`self.xml_tag_name`."""
         my_elem = ET.SubElement(root, self.xml_tag_name)
         for attr in self.xml_attrs:
-            cur_xml = ET.SubElement(my_elem, attr)
-            attr_str = str(getattr(self, attr))
-            cur_xml.text = attr_str.encode()
+            if hasattr(self, attr):
+                cur_xml = ET.SubElement(my_elem, attr)
+                attr_str = str(getattr(self, attr))
+                cur_xml.text = attr_str.encode()
 
         return my_elem
     
