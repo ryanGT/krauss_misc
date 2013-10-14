@@ -137,8 +137,8 @@ def FindFullPath(relpath, basepaths=['Z:\\','D:\\','C:\\ryan','C:\\','E:\\']):
     if os.path.exists(relpath):
         return os.path.abspath(relpath)
     #print('relpath='+str(relpath))
-    if amiMac():
-        ryan = '/home/ryan'
+    #if amiMac():
+    ryan = '/home/ryan'
     if relpath.find(ryan) == 0:
         rest = relpath[len(ryan):]
         if rest[0] == '/':
