@@ -666,3 +666,12 @@ def find_unique(listin):
     temp = [1]*len(listin)
     mydict = dict(zip(listin, temp))
     return mydict.keys()
+
+
+def clean_latex(strin):
+    badlist = ['$','{','}','\\']
+    strout = copy.copy(strin)
+    for item in badlist:
+        strout = strout.replace(item, '')
+
+    return strout
