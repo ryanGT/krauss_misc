@@ -217,6 +217,14 @@ def amiMac():
     else:
         return 0
 
+def amiWindows():
+    platstr = sys.platform
+    platstr = platstr.lower()
+    if platstr.find('win') == 0:
+        return 1
+    else:
+        return 0
+    
 def find_dirs(path, hidden=False, returnrel=True):
     pattern = os.path.join(path,'*')
     myfiles=glob.glob(pattern)
