@@ -675,3 +675,8 @@ def clean_latex(strin):
         strout = strout.replace(item, '')
 
     return strout
+
+
+def texify_path(pathin):
+    pathout = pathin.replace('\\','/')
+    return pathout
