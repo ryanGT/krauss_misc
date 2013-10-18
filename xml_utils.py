@@ -201,8 +201,11 @@ def children_to_dict(element):
     for child in element.getchildren():
         key = child.tag.strip()
         key = full_clean(key)
-        val = child.text.strip()
-        val = full_clean(val)
+        if child.text:
+            val = child.text.strip()
+            val = full_clean(val)
+        else:
+            val = None
         mydict[key] = val
     return mydict
 
@@ -248,9 +251,11 @@ def list_string_to_list(string_in):
     """Convert a string such as '[1,2,3]' to an actual list instance"""
     #print('string_in = ' + str(string_in))
     string0 = string_in.strip()
-    if string0[0] == '[':
+    if not string0:
+        return string0
+    if string0[0] in ['[','(']:
         string0 = string0[1:]
-    if string0[-1] == ']':
+    if string0[-1] in [']',')']:
         string0 = string0[0:-1]
     
     mylist = string0.split(',')
