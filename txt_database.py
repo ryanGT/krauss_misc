@@ -5,15 +5,84 @@ import copy
 
 import txt_mixin, delimited_file_utils
 
-#from IPython.core.debugger import Pdb
+from IPython.core.debugger import Pdb
 
 def label_to_attr_name(label):
-    illegal_chars = [' ',':','/','\\']
+    illegal_chars = [' ',':','/','\\','#','(',')']
     attr = label
     for char in illegal_chars:
         attr = attr.replace(char, '_')
+    attr = attr.replace('__','_')
+    while attr[-1] == '_':
+        attr = attr[0:-1]
+        
     return attr
 
+
+def empty_data(data):
+    """Check to see if data is an empty list or None."""
+    if data is None:
+        return True
+    elif type(data) == list:
+        if len(data) == 0:
+            return True
+            
+    return False
+
+
+def quote_strings(listin):
+    listout = []
+
+    for item_in in listin:
+        try:
+            item = float(item_in)
+        except ValueError:
+            item = item_in
+        if type(item) in [str, unicode, numpy.string_]:
+            value_out = '"%s"' % item
+        else:
+            value_out = item
+        listout.append(value_out)
+
+    return listout
+
+
+def prep_data_for_save(data_in):
+    #this is probably not the most efficient way to do this if data_in
+    #is a numpy array of strings
+    data_out = []
+    for row in data_in:
+        row_out = quote_strings(row)
+        data_out.append(row_out)
+
+    return data_out
+    
+
+class db_row(object):
+    """This class will represent one row of a database and will be
+    what is return when code iterates over a db."""
+    def __init__(self, row_data, col_attr_dict):
+        self.row_data = row_data
+        self.col_attr_dict = col_attr_dict
+        self.map_cols_to_attr()
+        
+        
+    def map_cols_to_attr(self):
+        """make each column of self.data an attribute of the db
+        instance."""
+        for attr, col_ind in self.col_attr_dict.iteritems():
+            setattr(self, attr, self.row_data[col_ind])
+
+    def __repr__(self):
+        outstr = ''
+        for key in self.col_attr_dict.keys():
+            val = getattr(self, key)
+            outstr += '%s: %s\n' % (key, val)
+
+        return outstr
+
+      
+        
 
 class txt_database(object):
     def search_attr_exact_match(self, attr, match):
@@ -28,6 +97,27 @@ class txt_database(object):
         else:
             bool_vect = vect==match
         return bool_vect
+
+
+    def find_col_from_list(self, label_list, case_sensitive=False):
+        """search through self.col_attr_dict to find a key in
+        label_list.  When a key is found that is in label_list, return
+        the corresponding column index.  If case_sensitive is False,
+        use .lower() on the keys and the labels."""
+        if not case_sensitive:
+            search_list = [item.lower() for item in label_list]
+        else:
+            search_list = label_list
+
+        for key, col_ind in self.col_attr_dict.iteritems():
+            if not case_sensitive:
+                key = key.lower()
+            if key in search_list:
+                return col_ind
+
+        #if we got this far, the method did not find a column and will
+        #return None
+            
 
     
     def _empty_strings_to_0(self, vect):
@@ -113,7 +203,27 @@ class txt_database(object):
         row_data = self.get_row(key, key_label)
         mydict = dict(zip(self.labels, row_data))
         return mydict
-    
+
+
+    def __getitem__(self, index):
+        row_data = self.data[index,:]
+        #mydict = dict(zip(self.labels, row_data))
+        #return mydict
+        myrow = db_row(row_data, self.col_attr_dict)
+        return myrow
+
+
+    def search_for_key(self, key, key_label):
+        key_col_ind = self.col_inds[key_label]
+        if self.data is None:
+            return []
+        elif type(self.data) == list:
+            if len(self.data) == 0:
+                return []
+        key_col = self.data[:,key_col_ind]
+        match_inds = where(key_col==key)[0]
+        return match_inds
+
 
     def update_one_row(self, key, key_label, update_dict):
         """Determine the correct row by search for key in the column
@@ -134,17 +244,24 @@ class txt_database(object):
 
     def add_new_row(self, key, key_label, new_dict):
         key_col_ind = self.col_inds[key_label]
-        key_col = self.data[:,key_col_ind]
-        match_inds = where(key_col==key)[0]
-        assert len(match_inds) == 0, "Attempting to add a new row with a key that already exists: " + str(key)
-        nr, nc = self.data.shape
+        if empty_data(self.data):
+            nc = len(self.labels)
+        else:
+            key_col = self.data[:,key_col_ind]
+            match_inds = where(key_col==key)[0]
+            assert len(match_inds) == 0, "Attempting to add a new row with a key that already exists: " + str(key)
+            nr, nc = self.data.shape
+            
         new_list = ['']*nc
         for key, val in new_dict.iteritems():
             key_col_ind = self.col_inds[key]
             new_list[key_col_ind] = str(val)
-            
+
         new_row = array([new_list])
-        self.data = numpy.append(self.data, new_row, axis=0)
+        if empty_data(self.data):
+            self.data = new_row
+        else:
+            self.data = numpy.append(self.data, new_row, axis=0)
 
 
     def add_new_column(self, col_data, label):
@@ -169,11 +286,33 @@ class txt_database(object):
         inds = range(self.N_cols)
         self.col_inds = dict(zip(self.labels, inds))
         self._col_labels_to_attr_names()
-        self.map_cols_to_attr()
+        self.next_ind = -1
+        try:
+            self.map_cols_to_attr()
+        except:
+            pass
 
+
+    def __iter__(self):
+        return self
+    
+    def next(self):
+        self.next_ind += 1
+        nr, nc = self.data.shape
+
+        if self.next_ind >= nr:
+            raise StopIteration
+        else:
+            
+            return self[self.next_ind]
+        
 
     def save(self, pathout, delim='\t'):
-        misc_utils.dump_matrix(pathout, self.data, self.labels, \
+        """I need to add an intermediate step to quote strings for csv
+        compliance, i.e. 'this is one really, really, long cell with
+        commas.'"""
+        data_out = prep_data_for_save(self.data)
+        misc_utils.dump_matrix(pathout, data_out, self.labels, \
                                fmt='%s', delim=delim)
 
 
@@ -182,7 +321,22 @@ class txt_database(object):
         filt_data = copy.copy(self.data[boolvect])
         new_db = txt_database(filt_data, self.labels)
         return new_db
-            
+
+
+    def get_data_subset(self, key_label, match_keys):
+        """search through the column whose label is key_label and find
+        the entries that match match_keys.  Return a db that contains
+        the subset of data that corresponds to those rows."""
+        row_inds = []
+
+        for key in match_keys:
+            ind = self.get_ind(key, key_label)
+            row_inds.append(ind)
+
+        data = self.data[row_inds,:]
+        new_db = txt_database(data, self.labels)
+        return new_db
+
         
 
 def _open_txt_file(pathin, delim='\t'):

@@ -112,3 +112,7 @@ def open_delimited_with_sniffer_and_check(pathin):
     test = check_delimited_for_uniformity(list3)
     assert test, "opening %s failed the uniformity check" % pathin
     return array(list3)
+
+
+#def write_removing_numeric_quotes(data, labels, filepath):
+    

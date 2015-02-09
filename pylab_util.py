@@ -167,3 +167,12 @@ def SetMagTicks(fi, *args, **kwargs):
 def set_Bode_opts(fi, bodeopts, coh=True):
     fig = _get_fig(fi)
     mplutil.set_Bode_opts(fig, bodeopts, coh=coh)
+
+
+def set_custom_dashes(fi, line_id=0, \
+                      dash_pattern=[7,4,2,4]):
+    fig = _get_fig(fi)
+    axes = fig.axes
+    mplutil.set_custom_dashes(axes, line_id=line_id, \
+                              dash_pattern=dash_pattern)
+

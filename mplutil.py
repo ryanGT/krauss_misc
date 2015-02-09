@@ -264,6 +264,13 @@ def set_Bode_opts(fig, bodeopts, coh=True):
 
 
 
+def set_custom_dashes(axes, line_id=0, \
+                      dash_pattern=[7,4,2,4]):
+    for ax in axes:
+        line = ax.lines[line_id]
+        line.set_dashes(dash_pattern)
+
+
 #from pylab import figure, subplot, yticks, xticks, ylabel, xlabel, title, semilogx, gca
 
 ## def SetPlotLims(fi,myxlim, ylim1,ylim2=[]):

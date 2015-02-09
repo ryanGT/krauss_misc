@@ -680,3 +680,29 @@ def clean_latex(strin):
 def texify_path(pathin):
     pathout = pathin.replace('\\','/')
     return pathout
+
+
+def print_list_of_variables(listin, namespace, fmt='%s'):
+    fmt2 = '%s = ' + fmt
+
+    for var in listin:
+        num = eval(var, namespace)
+        print(fmt2 % (var, num))
+
+
+def get_first_key_that_exists(dictin, keylist):
+    """Try the keys in keylist in order and return the value for the
+    first key that exists."""
+    found_key = 0
+
+    for key in keylist:
+        if dictin.has_key(key):
+            found_key = 1
+            return dictin[key]
+
+    #we should never reach this point if any key in keylist is found
+    valid_keys = dictin.keys()
+    msg = "Did not find a match for any key in keylist: %s.  \n Valid keys: %s" % \
+         (keylist, valid_keys)
+    
+    assert found_key == 1, msg
