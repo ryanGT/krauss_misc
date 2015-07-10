@@ -160,6 +160,7 @@ class txt_database(object):
             attr_names.append(attr)
         self.attr_names = attr_names
         self.label_attr_dict = dict(zip(self.attr_names, self.labels))
+        self.attr_label_dict = dict(zip(self.labels, self.attr_names))
         N = len(self.attr_names)
         inds = range(N)
         self.col_attr_dict = dict(zip(self.attr_names, inds))
@@ -242,7 +243,7 @@ class txt_database(object):
             
             
 
-    def add_new_row(self, key, key_label, new_dict):
+    def new_row(self, key, key_label, new_dict):
         key_col_ind = self.col_inds[key_label]
         if empty_data(self.data):
             nc = len(self.labels)
