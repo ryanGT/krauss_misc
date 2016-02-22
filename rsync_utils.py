@@ -16,15 +16,20 @@ def check_dst(dst_in):
 def rsync_one(src, dst, flags=['-av',exclude_from_str]):
     check_src(src)
     check_dst(dst)
+    if src[-1] == filesep:
+        src = src[0:-1]
+        
     flag_str = ' '.join(flags)
     cmd = 'rsync %s %s %s' % (flag_str, src, dst)
+    print('================')
     print(cmd)
-    #os.system(cmd)
+    print('================')
+    os.system(cmd)
 
               
 class rsync_runner(object):
     def __init__(self, src_root, dst_root, dst_folder='', relpaths=[], \
-                 flags=['-av',exclude_from_str]):
+                 flags=['-av',exclude_from_str,"--exclude='.git/'"]):
         self.src_root = os.path.expanduser(src_root)
         check_src(self.src_root)
         self.dst_root = dst_root
@@ -71,4 +76,8 @@ class rsync_runner(object):
         for item in self.relpaths:
             src_path = os.path.join(self.src_root, item)
             cur_dest = os.path.join(self.dst_path, item)
+            if os.path.isdir(src_path):
+                #pop last folder
+                cur_dest, folder = os.path.split(cur_dest)
+            
             rsync_one(src_path, cur_dest, flags=self.flags)
