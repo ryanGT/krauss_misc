@@ -17,7 +17,7 @@ def rsync_one(src, dst, flags=['-av',exclude_from_str]):
     check_src(src)
     check_dst(dst)
     flag_str = ' '.join(flags)
-    cmd = 'rsync %s %s %s' % (src, dst, flags)
+    cmd = 'rsync %s %s %s' % (flag_str, src, dst)
     print(cmd)
     #os.system(cmd)
 
