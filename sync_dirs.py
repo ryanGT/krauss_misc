@@ -13,16 +13,16 @@ quick_all = ['scripts', \
              'siue/classes/Spring_2016', \
              'siue/admin/grad_committee', \
              'siue/Research/papers/ACC/2016_zumo_RPi_Arduino', \
-             'git/research', \
-             'git/krauss_misc', \
-             'git/olliei2c', \
-             'git/teaching', \
-             'git/olliespi', \
              ]
 
 # add specific Research/work folders latter
 
-weekly_all = ['siue/Research/presentations/ACC/2016_zumo_RPi_Arduino', \
+weekly_all = ['git/research', \
+              'git/krauss_misc', \
+              'git/olliei2c', \
+              'git/teaching', \
+              'git/olliespi', \
+              'siue/Research/presentations/ACC/2016_zumo_RPi_Arduino', \
               'siue/Research/students/vahid', \
               'siue/Research/work', \
               'git/report_generation', \
