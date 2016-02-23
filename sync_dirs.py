@@ -12,6 +12,8 @@ quick_all = ['scripts', \
              'elisp', \
              'siue/classes/Spring_2016', \
              'siue/admin/grad_committee', \
+             'siue/admin/tau_beta_pi', \
+             'siue/admin/travel_forms', \
              'siue/Research/papers/ACC/2016_zumo_RPi_Arduino', \
              ]
 

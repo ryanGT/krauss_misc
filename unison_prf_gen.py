@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import os
 from sync_dirs import quick_all, weekly_all
 import txt_mixin
