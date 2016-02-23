@@ -13,7 +13,7 @@ def check_dst(dst_in):
     assert dst_in.find('/Volumes/') == 0, 'bad dst: %s' % dst_in
     
     
-def rsync_one(src, dst, flags=['-rtv',exclude_from_str]):
+def rsync_one(src, dst, flags=['-rv',exclude_from_str]):
     check_src(src)
     check_dst(dst)
     if src[-1] == filesep:
@@ -21,15 +21,15 @@ def rsync_one(src, dst, flags=['-rtv',exclude_from_str]):
         
     flag_str = ' '.join(flags)
     cmd = 'rsync %s %s %s' % (flag_str, src, dst)
-    print('================')
-    print(cmd)
-    print('================')
+    #print('================')
+    #print(cmd)
+    #print('================')
     os.system(cmd)
 
               
 class rsync_runner(object):
     def __init__(self, src_root, dst_root, dst_folder='', relpaths=[], \
-                 flags=['-rtv',exclude_from_str,"--exclude='.git/'"]):
+                 flags=['-rv',exclude_from_str,"--exclude='.git/'"]):
         self.src_root = os.path.expanduser(src_root)
         check_src(self.src_root)
         self.dst_root = dst_root
