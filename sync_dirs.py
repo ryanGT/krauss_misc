@@ -36,4 +36,6 @@ weekly_all = ['git/research', \
               'git/pygtk_utils', \
               'git/zumo_serial', \
               'git/raspberry_pi_learn', \
+              'Library/Services', \
+              'Library/Scripts', \
               ]
