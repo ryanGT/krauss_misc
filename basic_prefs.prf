@@ -1,0 +1,35 @@
+# Unison preferences file
+#batch = true
+perms = 0
+ignorecase = true
+
+#fastcheck = true
+
+ignore = Path {.Trash-ryan}
+
+#ignore = Path siue/srf_backup
+#ignore = Path siue/SRF_supplemental
+#the next 2 were moved to siue/Research/SRF_Proposal (they are identical)
+#ignore = Path {siue/SRF}
+#ignore = Path {siue/SRF_Proposal}
+#ignore = Path {pythonutil/PyDSTool}
+
+################################
+# Frozen folders
+#ignore = Path {siue/Research/LS_DYNA}
+#ignore = Path {siue/classes/356}
+#ignore = Path {siue/classes/AdvDynamics}
+#ignore = Path {siue/classes/robotics}
+#ignore = Path {siue/classes/mechatronics/2006}
+################################
+
+# Ignore files
+ignore = Name {*.pyd,*.pyc}
+ignore = Name {*.~*~,*.*~,#*#,*~,.#*,*~}
+ignore = Name {*.log,*.blg,*.out,*.aux,*.lnk}
+
+#ignore = Path {*/.svn}
+ignore = Name {*/.svn/*}
+ignore = Name {.#*.py}
+ignore = Name {.emacs.desktop.lock}
+ignore = Name {auto}
