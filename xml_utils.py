@@ -11,7 +11,7 @@ Autodoc Content
 +++++++++++++++++++
 """
 
-import xml.etree.ElementTree as ET
+import xml.etree.cElementTree as ET
 from xml.dom import minidom
 
 import re, pdb
@@ -37,10 +37,11 @@ class xml_writer(object):
             if hasattr(self, attr):
                 cur_xml = ET.SubElement(my_elem, attr)
                 attr_str = str(getattr(self, attr))
-                cur_xml.text = attr_str.encode()
+                cur_xml.text = attr_str.encode('UTF-8')
 
         return my_elem
     
+etparser = ET.XMLParser(encoding="utf-8")
 
 class xml_parser(object):
     """This is a base for XML parsers.  If the user does not pass in a
@@ -53,7 +54,7 @@ class xml_parser(object):
     def __init__(self, filename=None):
         self.filename = filename
         if self.filename is not None:
-            self.tree = ET.parse(filename)
+            self.tree = ET.parse(filename, parser=etparser)
             self.root = self.tree.getroot()
 
 
@@ -139,7 +140,7 @@ def full_clean(string_in):
     if string_in is None:
         return string_in
     elif type(string_in) == unicode:
-        string_in = string_in.encode()
+        string_in = string_in.encode('UTF-8')
     elif type(string_in) not in [str, unicode]:
         return string_in
     string_out = string_in.strip()
@@ -157,12 +158,30 @@ def full_clean(string_in):
     return string_out
 
 
+def indent(elem, level=0):
+    i = "\n" + level*"  "
+    j = "\n" + (level-1)*"  "
+    if len(elem):
+        if not elem.text or not elem.text.strip():
+            elem.text = i + "  "
+        if not elem.tail or not elem.tail.strip():
+            elem.tail = i
+        for subelem in elem:
+            indent(subelem, level+1)
+        if not elem.tail or not elem.tail.strip():
+            elem.tail = j
+    else:
+        if level and (not elem.tail or not elem.tail.strip()):
+            elem.tail = j
+    return elem
+
 def prettify(elem):
     """Return a pretty-printed XML string for the Element.
 
     This function does successive indenting of the XML tree
     """
-    rough_string = ET.tostring(elem, 'utf-8')
+    print('elem= %s' % elem)
+    rough_string = ET.tostring(elem,encoding='UTF-8')
     reparsed = minidom.parseString(rough_string)
     return reparsed.toprettyxml(indent="  ")
 
@@ -263,7 +282,7 @@ def list_string_to_list(string_in):
     #mylist00 = [clean_unicode(item) for item in mylist]
     #mylist00A = [clean_extra_quotes(item) for item in mylist00]
     mylist00 = [full_clean(item) for item in mylist]
-    mylist0 = [label.encode() for label in mylist00]
+    mylist0 = [label.encode('UTF-8') for label in mylist00]
     mylist2 = [label.strip() for label in mylist0]
     mylist3 = [try_string_to_number(item) for item in mylist2]
     ## print('items out:')
@@ -305,9 +324,12 @@ def dict_string_to_dict(string_in):
 def write_pretty_xml(root, xmlpath):
     """Write the XML of root to xmlpath after passing it through
     :py:func:`prettify`"""
+    #import pdb
+    #pdb.set_trace()
     pretty_str = prettify(root)
+    #pretty_str = indent(root)
     f = open(xmlpath, 'wb')
-    f.write(pretty_str)
+    f.write(pretty_str.encode("UTF-8"))
     f.close()
 
 
