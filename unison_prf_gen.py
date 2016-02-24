@@ -56,30 +56,56 @@ class prf_generator(object):
 
 
 if __name__ == '__main__':
-    gen1 = prf_generator('KRAUSS1_daily.prf', \
-                         root1='/Users/rkrauss/', \
-                         root2='/Volumes/KRAUSS1/', \
-                         root2_folder='backup_unison', \
-                         path_list=quick_all)
-    gen1.go()
+    ## gen1 = prf_generator('KRAUSS1_daily.prf', \
+    ##                      root1='/Users/rkrauss/', \
+    ##                      root2='/Volumes/KRAUSS1/', \
+    ##                      root2_folder='backup_unison', \
+    ##                      path_list=quick_all)
+    ## gen1.go()
 
-    gen2 = prf_generator('KRAUSS1_weekly.prf', \
-                         root1='/Users/rkrauss/', \
-                         root2='/Volumes/KRAUSS1/', \
-                         root2_folder='backup_unison', \
-                         path_list=all1)
-    gen2.go()
+    ## gen2 = prf_generator('KRAUSS1_weekly.prf', \
+    ##                      root1='/Users/rkrauss/', \
+    ##                      root2='/Volumes/KRAUSS1/', \
+    ##                      root2_folder='backup_unison', \
+    ##                      path_list=all1)
+    ## gen2.go()
 
-    gen3 = prf_generator('Rosewill_SSD_daily.prf', \
-                         root1='/Users/rkrauss/', \
-                         root2='/Volumes/RYANSSD1', \
-                         root2_folder=None, \
-                         path_list=quick_all)
-    gen3.go()
+    ## gen3 = prf_generator('Rosewill_SSD_daily.prf', \
+    ##                      root1='/Users/rkrauss/', \
+    ##                      root2='/Volumes/RYANSSD1', \
+    ##                      root2_folder=None, \
+    ##                      path_list=quick_all)
+    ## gen3.go()
 
-    gen4 = prf_generator('Rosewill_SSD_weekly.prf', \
-                         root1='/Users/rkrauss/', \
-                         root2='/Volumes/RYANSSD1/', \
-                         root2_folder=None, \
-                         path_list=all1)
-    gen4.go()
+    ## gen4 = prf_generator('Rosewill_SSD_weekly.prf', \
+    ##                      root1='/Users/rkrauss/', \
+    ##                      root2='/Volumes/RYANSSD1/', \
+    ##                      root2_folder=None, \
+    ##                      path_list=all1)
+    ## gen4.go()
+
+    mytuples = [('KRAUSS1_%s.prf','/Volumes/KRAUSS1/','backup_unison'), \
+                ('Rosewill_SSD_%s.prf','/Volumes/RYANSSD1', None), \
+                ('Flash_Voyager_%s.prf','/Volumes/KRAUSSF1', None), \
+                ]
+
+    for curtup in mytuples:
+        pat = curtup[0]
+        root2 = curtup[1]
+        root2_folder = curtup[2]
+
+        daily_name = pat % 'daily'
+        daily_gen = prf_generator(daily_name, \
+                                  root1='/Users/rkrauss/', \
+                                  root2=root2, \
+                                  root2_folder=root2_folder, \
+                                  path_list=quick_all)
+        daily_gen.go()
+
+        weekly_name = pat % 'weekly'
+        weekly_gen = prf_generator(weekly_name, \
+                          root1='/Users/rkrauss/', \
+                          root2=root2, \
+                          root2_folder=root2_folder, \
+                          path_list=all1)
+        weekly_gen.go()
