@@ -87,6 +87,7 @@ if __name__ == '__main__':
     mytuples = [('KRAUSS1_%s.prf','/Volumes/KRAUSS1/','backup_unison'), \
                 ('Rosewill_SSD_%s.prf','/Volumes/RYANSSD1', None), \
                 ('Flash_Voyager_%s.prf','/Volumes/KRAUSSF1', None), \
+                ('IOMEGA_%s.prf', '/Volumes/IOMEGA', None), \
                 ]
 
     for curtup in mytuples:
