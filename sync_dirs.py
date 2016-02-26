@@ -38,4 +38,5 @@ weekly_all = ['git/research', \
               'git/raspberry_pi_learn', \
               'Library/Services', \
               'Library/Scripts', \
+              'Library/texmf', \
               ]
