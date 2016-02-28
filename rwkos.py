@@ -3,6 +3,95 @@ import pdb
 import shutil
 #from IPython.core.debugger import Pdb
 
+date_pat = re.compile('(\d\d)_(\d\d)_(\d\d)/*$')
+
+def check_lecture_dir(dir_in):
+    """Check to see if the current directory ends in mm_dd_yy and if
+    so figure out how to determine the lecture title of the form
+
+    ME 482 - mm/dd/yy
+
+    or
+
+    IE 106 - FR1 - mm/dd/yy"""
+    q = date_pat.search(dir_in)
+    if q is None:
+        return None
+    else:
+        return True
+
+def get_lecture_title(dir_in):
+    """Assuming you used check_lecture_dir already, so you are sure
+    this is a lecture dir"""
+    q = date_pat.search(dir_in)
+    
+    mstr = q.group(1)
+    dstr = q.group(2)
+    ystr = q.group(3)
+    date_str = '%s/%s/%s' % (mstr, dstr, ystr)
+    path1 = os.path.expanduser(dir_in)
+    realpath = os.path.realpath(path1)
+    lecture_path, date_folder = os.path.split(realpath)
+    rest, lecture_folder = os.path.split(lecture_path)
+    assert lecture_folder == 'lectures', \
+           'lecture path seems to violate assumptions: %s' % lecture_path
+    # I could stop at the date, but I would kind of like the course.
+    # - things could be a little weird if I have symbolic links like:
+    #   - ~/FR2_IE_106_Sp_16/lectures
+    q106 = re.search('IM*E_*106',rest)
+    if q106:
+        # this is IE 106 and there is a sec_F* in the folder
+        # - folder up from lectures should contain the section information
+        rest2, sec_folder = os.path.split(rest)
+        q_sec = re.search('[Ss]ec_*(F.*)', sec_folder)
+        sec_str = q_sec.group(1)
+        title = 'IE 106 - %s - %s' % (sec_str, date_str)
+    else:
+        # assume the folder above lectures contains the course number,
+        # probably without the leading ME
+        rest2, course_folder = os.path.split(rest)
+        q_num_only = re.match('\d\d\d/*', course_folder)
+        if q_num_only:
+            course_str = 'ME ' + course_folder
+        else:
+            course_str = course_folder
+        title = '%s - %s' % (course_str, date_str)
+    return title
+                          
+        
+def find_pdfs_in_dir(dir_in, split=True):
+    glob_pat = os.path.join(dir_in, '*.pdf')
+    glob_files = glob.glob(glob_pat)
+    if split:
+        #drop folders
+        filenames_out = []
+        for curpath in glob_files:
+            folder, filename = os.path.split(curpath)
+            filenames_out.append(filename)
+        return filenames_out
+    else:
+        return glob_files
+
+
+def find_scanned_in_notes_pdf(dir_in):
+    glob_files = find_pdfs_in_dir(dir_in)
+    date_pat = re.compile('[IME]+_*\d\d\d_\d\d_\d\d_\d\d.pdf')
+    matches = []
+    for item in glob_files:
+        q = date_pat.search(item)
+        if q:
+            matches.append(item)
+    return matches
+
+
+def find_handout_pdf(dir_in):
+    glob_files = find_pdfs_in_dir(dir_in)
+    handouts = []
+    for item in glob_files:
+        if item.find('_handout') > -1:
+            handouts.append(item)
+    return handouts
+    
 def delete_from_glob_pat(pat):
     myfiles = glob.glob(pat)
     for curpath in myfiles:
