@@ -15,6 +15,7 @@ quick_all = ['scripts', \
              'siue/admin/tau_beta_pi', \
              'siue/admin/travel_forms', \
              'siue/Research/papers/ACC/2016_zumo_RPi_Arduino', \
+             'siue/admin/letters_or_recommendation', \
              'Documents/Arduino', \
              ]
 
