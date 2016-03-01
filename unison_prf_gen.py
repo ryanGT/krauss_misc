@@ -1,10 +1,12 @@
 #!/usr/bin/env python
 import os
-from sync_dirs import quick_all, weekly_all
+from sync_dirs import quick_all, weekly_all, quick_only
 import txt_mixin
 
 all1 = quick_all + weekly_all
 
+# quick_all means that it is included in all syncs, including weekly ones
+quick_paths = quick_all + quick_only
 ## include myprefs
 ## #include usb_ignore
 
@@ -100,7 +102,7 @@ if __name__ == '__main__':
                                   root1='/Users/rkrauss/', \
                                   root2=root2, \
                                   root2_folder=root2_folder, \
-                                  path_list=quick_all)
+                                  path_list=quick_paths)
         daily_gen.go()
 
         weekly_name = pat % 'weekly'

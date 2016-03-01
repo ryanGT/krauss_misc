@@ -11,13 +11,16 @@ quick_all = ['scripts', \
              '.emacs', \
              'elisp', \
              'siue/classes/Spring_2016', \
-             'siue/admin/grad_committee', \
-             'siue/admin/tau_beta_pi', \
-             'siue/admin/travel_forms', \
              'siue/Research/papers/ACC/2016_zumo_RPi_Arduino', \
-             'siue/admin/letters_or_recommendation', \
              'Documents/Arduino', \
              ]
+
+quick_only = ['siue/admin/grad_committee', \
+              'siue/admin/tau_beta_pi', \
+              'siue/admin/travel_forms', \
+              'siue/admin/letters_or_recommendation', \
+              'siue/admin/search_committes', \
+              ]
 
 # add specific Research/work folders latter
 
@@ -41,7 +44,9 @@ weekly_all = ['git/research', \
               'Library/Services', \
               'Library/Scripts', \
               'Library/texmf', \
-              'siue/admin/MRE_program', \
-              'siue/admin/search_committes', \
-              'siue/admin/ug_catalog', \
+              'siue/admin', \
               ]
+
+#'siue/admin/MRE_program', \
+#'siue/admin/search_committes', \
+#'siue/admin/ug_catalog', \
