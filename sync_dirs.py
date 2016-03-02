@@ -22,6 +22,9 @@ quick_only = ['siue/admin/grad_committee', \
               'siue/admin/search_committes', \
               ]
 
+personal = ['personal/business', \
+            ]
+
 # add specific Research/work folders latter
 
 weekly_all = ['git/research', \

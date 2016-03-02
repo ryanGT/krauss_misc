@@ -171,7 +171,8 @@ class txt_database(object):
         instance."""
         for attr, label in zip(self.attr_names, self.labels):
             col_ind = self.col_inds[label]
-            setattr(self, attr, self.data[:,col_ind])
+            if len(self.data) > 0:
+                setattr(self, attr, self.data[:,col_ind])
 
 
     def _sniff_delimiter(self, pathin):
@@ -268,7 +269,11 @@ class txt_database(object):
     def append_row_sorted(self, new_row):
         """Append row to self.data, assuming row is sorted in the same
         order as the existing data."""
-        self.data = numpy.append(self.data, new_row, axis=0)
+        if len(self.data) == 0:
+            self.data = numpy.atleast_2d(new_row)
+        else:
+            new2d = numpy.atleast_2d(new_row)
+            self.data = numpy.append(self.data, new2d, axis=0)
         
 
     def add_new_column(self, col_data, label):

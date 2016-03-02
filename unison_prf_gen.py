@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import os
-from sync_dirs import quick_all, weekly_all, quick_only
+from sync_dirs import quick_all, weekly_all, quick_only, personal
 import txt_mixin
 
 all1 = quick_all + weekly_all
@@ -103,6 +103,14 @@ if __name__ == '__main__':
                                   root2=root2, \
                                   root2_folder=root2_folder, \
                                   path_list=quick_paths)
+        daily_gen.go()
+
+        daily_name = pat % 'personal'
+        daily_gen = prf_generator(daily_name, \
+                                  root1='/Users/rkrauss/', \
+                                  root2=root2, \
+                                  root2_folder=root2_folder, \
+                                  path_list=personal)
         daily_gen.go()
 
         weekly_name = pat % 'weekly'
