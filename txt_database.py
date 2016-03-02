@@ -265,6 +265,12 @@ class txt_database(object):
             self.data = numpy.append(self.data, new_row, axis=0)
 
 
+    def append_row_sorted(self, new_row):
+        """Append row to self.data, assuming row is sorted in the same
+        order as the existing data."""
+        self.data = numpy.append(self.data, new_row, axis=0)
+        
+
     def add_new_column(self, col_data, label):
         new_data = column_stack([self.data,col_data])
         new_labels = numpy.append(self.labels, label)
