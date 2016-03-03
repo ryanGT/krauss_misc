@@ -19,7 +19,7 @@ quick_only = ['siue/admin/grad_committee', \
               'siue/admin/tau_beta_pi', \
               'siue/admin/travel_forms', \
               'siue/admin/letters_or_recommendation', \
-              'siue/admin/search_committes', \
+              'siue/admin/search_committees', \
               ]
 
 personal = ['personal/business', \
@@ -53,3 +53,7 @@ weekly_all = ['git/research', \
 #'siue/admin/MRE_program', \
 #'siue/admin/search_committes', \
 #'siue/admin/ug_catalog', \
+
+ignore_list = ['siue/admin/open_house', \
+               'siue/admin/search_committees/ME_Search_2014', \
+               ]

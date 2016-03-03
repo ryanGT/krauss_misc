@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 import os
-from sync_dirs import quick_all, weekly_all, quick_only, personal
+from sync_dirs import quick_all, weekly_all, quick_only, personal, \
+     ignore_list
+
 import txt_mixin
 
 all1 = quick_all + weekly_all
@@ -15,6 +17,9 @@ quick_paths = quick_all + quick_only
 ## path = scripts
 unison_path = '/Users/rkrauss/.unison/'
 
+# ignore = Path {siue/admin/open_house}
+
+               
 class prf_generator(object):
     def __init__(self, filename, root1='/Users/rkrauss/', \
                  root2='/Volumes/KRAUSS1/', \
@@ -41,6 +46,12 @@ class prf_generator(object):
         for item in self.path_list:
             out('path = %s' % item)
 
+        # append ignore paths
+        out('')
+        for item in ignore_list:
+            curline = 'ignore = Path {%s}' % item
+            out(curline)
+            
         self.list = mylist
 
 
