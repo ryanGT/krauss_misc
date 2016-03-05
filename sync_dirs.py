@@ -13,6 +13,7 @@ quick_all = ['scripts', \
              'siue/classes/Spring_2016', \
              'siue/Research/papers/ACC/2016_zumo_RPi_Arduino', \
              'Documents/Arduino', \
+             'git/olliespi', \
              ]
 
 quick_only = ['siue/admin/grad_committee', \
@@ -31,7 +32,6 @@ weekly_all = ['git/research', \
               'git/krauss_misc', \
               'git/olliei2c', \
               'git/teaching', \
-              'git/olliespi', \
               'siue/Research/presentations/ACC/2016_zumo_RPi_Arduino', \
               'siue/Research/students/vahid', \
               'siue/Research/work', \
