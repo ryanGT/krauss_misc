@@ -19,7 +19,7 @@ quick_all = ['scripts', \
 quick_only = ['siue/admin/grad_committee', \
               'siue/admin/tau_beta_pi', \
               'siue/admin/travel_forms', \
-              'siue/admin/letters_or_recommendation', \
+              'siue/admin/letters_of_recommendation', \
               'siue/admin/search_committees', \
               ]
 
