@@ -21,6 +21,7 @@ quick_only = ['siue/admin/grad_committee', \
               'siue/admin/travel_forms', \
               'siue/admin/letters_of_recommendation', \
               'siue/admin/search_committees', \
+              'siue/admin/MRE_program', \
               ]
 
 personal = ['personal/business', \
