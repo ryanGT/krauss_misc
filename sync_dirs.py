@@ -11,7 +11,6 @@ quick_all = ['scripts', \
              '.emacs', \
              'elisp', \
              'siue/classes/Spring_2016', \
-             'siue/Research/papers/ACC/2016_zumo_RPi_Arduino', \
              'Documents/Arduino', \
              'git/olliespi', \
              ]
@@ -22,6 +21,8 @@ quick_only = ['siue/admin/grad_committee', \
               'siue/admin/letters_of_recommendation', \
               'siue/admin/search_committees', \
               'siue/admin/MRE_program', \
+              'siue/Research/papers/ACC/2016_zumo_RPi_Arduino', \
+              'siue/Research/papers/ASEE/krauss_fries_karacal_2016', \
               ]
 
 personal = ['personal/business', \
@@ -49,6 +50,7 @@ weekly_all = ['git/research', \
               'Library/Scripts', \
               'Library/texmf', \
               'siue/admin', \
+              'siue/Research/papers', \
               ]
 
 #'siue/admin/MRE_program', \
