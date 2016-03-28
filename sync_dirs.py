@@ -13,6 +13,7 @@ quick_all = ['scripts', \
              'siue/classes/Spring_2016', \
              'Documents/Arduino', \
              'git/olliespi', \
+             'siue/Research/Proposals/internal', \
              ]
 
 quick_only = ['siue/admin/grad_committee', \
