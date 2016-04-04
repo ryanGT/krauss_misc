@@ -37,6 +37,7 @@ weekly_all = ['git/research', \
               'git/teaching', \
               'siue/Research/presentations/ACC/2016_zumo_RPi_Arduino', \
               'siue/Research/students/vahid', \
+              'siue/Research/students/bret', \              
               'siue/Research/work', \
               'git/report_generation', \
               'git/restutils', \
