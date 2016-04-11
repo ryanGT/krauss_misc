@@ -11,6 +11,7 @@ quick_all = ['scripts', \
              '.emacs', \
              'elisp', \
              'siue/classes/Spring_2016', \
+             'siue/classes/Summer_2016', \
              'Documents/Arduino', \
              'git/olliespi', \
              'siue/Research/Proposals/internal', \
