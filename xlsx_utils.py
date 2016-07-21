@@ -1,4 +1,4 @@
-import openpyxl, txt_mixin, datetime
+import openpyxl, datetime
 
 def search_one_label(cellin, match):
     value = cellin.value
@@ -35,6 +35,7 @@ def encode_values(list_of_values):
         if type(item) == unicode:
             value_out = item.encode('ascii', 'ignore')
         elif type(item) == datetime.datetime:
+            fmt_time = '%m/%d/%y'#<-- this seems like a risky hard code
             value_out = item.strftime(fmt_time)
         elif item is None:
             value_out = ''
@@ -52,9 +53,9 @@ def convert_row_to_string(rowin):
 
 
 def clean_string(str_in):
-    """clean up strings that some people think are ok in Excel (mainly
-    newlines)."""
-    if type(str_in) in [int, float]:
+    """clean up strings that I find hard to deal with in spreadsheet
+    cells (mainly newlines)."""
+    if type(str_in) in [int, float, long]:
         return str_in
     find_rep_tuples = [('\n','; '), \
                        ('\r','; '), \
@@ -124,8 +125,9 @@ def get_all_data(sheet_in, debug=0):
 
 
 
-def get_all_data_by_filename(filename, sheet_ind=0, verbosity=1):
-    wb = openpyxl.load_workbook(filename)
+def get_all_data_by_filename(filename, sheet_ind=0, verbosity=1, \
+                             data_only=False):
+    wb = openpyxl.load_workbook(filename, data_only=data_only)
     sheet_names = wb.get_sheet_names()
 
     if len(sheet_names) > 1 and verbosity > 0:
