@@ -32,7 +32,7 @@ def encode_values(list_of_values):
     values_out = []
 
     for item in list_of_values:
-        if type(item) == unicode:
+        if type(item) == str:
             value_out = item.encode('ascii', 'ignore')
         elif type(item) == datetime.datetime:
             fmt_time = '%m/%d/%y'#<-- this seems like a risky hard code
@@ -55,8 +55,13 @@ def convert_row_to_string(rowin):
 def clean_string(str_in):
     """clean up strings that I find hard to deal with in spreadsheet
     cells (mainly newlines)."""
-    if type(str_in) in [int, float, long]:
+    if type(str_in) in [int, float]:
         return str_in
+    else:
+        print('type(str_in) = %s' % type(str_in))
+        #str_in = str(str_in)
+        if type(str_in) == bytes:
+            str_in = str_in.decode("utf-8")
     find_rep_tuples = [('\n','; '), \
                        ('\r','; '), \
                        ]

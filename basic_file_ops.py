@@ -86,7 +86,7 @@ def readfile(pathin, strip=False, rstrip=True, verbosity=0):
             print('found file:'+goodpath)
         f=open(goodpath,'r')
     else:
-        raise StandardError, "Could not find "+pathin+" in sys.path"
+        raise StandardError("Could not find "+pathin+" in sys.path")
     listin=f.readlines()
     f.close()
     if strip:
@@ -112,9 +112,9 @@ def add_newlines(listin):
 
 def writefile(pathin, listin, append=False):
     if append and os.path.exists(pathin):
-        openstr = 'ab'
+        openstr = 'a'
     else:
-        openstr = 'wb'
+        openstr = 'w'
     f = open(pathin, openstr)
     listout = add_newlines(listin)
     f.writelines(listout)

@@ -258,8 +258,11 @@ default_map = ['findall', 'findallre', 'findprevious', \
                'replaceallre', 'append','extend', \
                'replace_before', 'replace_line_before', \
                '__delitem__','__len__','__delattr__', \
-               '__delslice__','__getitem__','__setattr__', \
-               '__getslice__','__setitem__','__setslice__']
+               '__getitem__','__setattr__', \
+               '__setitem__',\
+               ]
+               #not py3 compatible:
+               #'__getslice__','__delslice__','__setslice__', \
 
 
 
@@ -351,7 +354,7 @@ def array_and_labels_to_spreadsheet_string(array, delim='\t', fmt='%s', \
                                            labels=[]):
     list_of_rows = [_row_to_spreadsheet_string(item, fmt=fmt, delim=delim) \
                     for item in array]
-    if labels:
+    if len(labels) > 0:
         label_row_str = _row_to_spreadsheet_string(labels, fmt='%s', delim=delim)
         list_of_rows = [label_row_str] + list_of_rows
 

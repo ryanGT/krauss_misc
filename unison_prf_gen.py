@@ -12,16 +12,16 @@ quick_paths = quick_all + quick_only
 ## include myprefs
 ## #include usb_ignore
 
-## root = /Users/rkrauss/
+## root = /Users/kraussry/
 ## root = /Volumes/KRAUSS1/backup_unison
 ## path = scripts
-unison_path = '/Users/rkrauss/.unison/'
+unison_path = '/Users/kraussry/.unison/'
 
 # ignore = Path {siue/admin/open_house}
 
                
 class prf_generator(object):
-    def __init__(self, filename, root1='/Users/rkrauss/', \
+    def __init__(self, filename, root1='/Users/kraussry/', \
                  root2='/Volumes/KRAUSS1/', \
                  root2_folder='', \
                  path_list=[]):
@@ -70,37 +70,34 @@ class prf_generator(object):
 
 if __name__ == '__main__':
     ## gen1 = prf_generator('KRAUSS1_daily.prf', \
-    ##                      root1='/Users/rkrauss/', \
+    ##                      root1='/Users/kraussry/', \
     ##                      root2='/Volumes/KRAUSS1/', \
     ##                      root2_folder='backup_unison', \
     ##                      path_list=quick_all)
     ## gen1.go()
 
     ## gen2 = prf_generator('KRAUSS1_weekly.prf', \
-    ##                      root1='/Users/rkrauss/', \
+    ##                      root1='/Users/kraussry/', \
     ##                      root2='/Volumes/KRAUSS1/', \
     ##                      root2_folder='backup_unison', \
     ##                      path_list=all1)
     ## gen2.go()
 
     ## gen3 = prf_generator('Rosewill_SSD_daily.prf', \
-    ##                      root1='/Users/rkrauss/', \
+    ##                      root1='/Users/kraussry/', \
     ##                      root2='/Volumes/RYANSSD1', \
     ##                      root2_folder=None, \
     ##                      path_list=quick_all)
     ## gen3.go()
 
     ## gen4 = prf_generator('Rosewill_SSD_weekly.prf', \
-    ##                      root1='/Users/rkrauss/', \
+    ##                      root1='/Users/kraussry/', \
     ##                      root2='/Volumes/RYANSSD1/', \
     ##                      root2_folder=None, \
     ##                      path_list=all1)
     ## gen4.go()
 
-    mytuples = [('KRAUSS1_%s.prf','/Volumes/KRAUSS1/','backup_unison'), \
-                ('Rosewill_SSD_%s.prf','/Volumes/RYANSSD1', None), \
-                ('Flash_Voyager_%s.prf','/Volumes/KRAUSSF1', None), \
-                ('IOMEGA_%s.prf', '/Volumes/IOMEGA', None), \
+    mytuples = [('KRAUSS1_%s.prf','/Volumes/KRAUSS1/','gvsu_backup'), \
                 ]
 
     for curtup in mytuples:
@@ -110,7 +107,7 @@ if __name__ == '__main__':
 
         daily_name = pat % 'daily'
         daily_gen = prf_generator(daily_name, \
-                                  root1='/Users/rkrauss/', \
+                                  root1='/Users/kraussry/', \
                                   root2=root2, \
                                   root2_folder=root2_folder, \
                                   path_list=quick_paths)
@@ -118,7 +115,7 @@ if __name__ == '__main__':
 
         daily_name = pat % 'personal'
         daily_gen = prf_generator(daily_name, \
-                                  root1='/Users/rkrauss/', \
+                                  root1='/Users/kraussry/', \
                                   root2=root2, \
                                   root2_folder=root2_folder, \
                                   path_list=personal)
@@ -126,7 +123,7 @@ if __name__ == '__main__':
 
         weekly_name = pat % 'weekly'
         weekly_gen = prf_generator(weekly_name, \
-                          root1='/Users/rkrauss/', \
+                          root1='/Users/kraussry/', \
                           root2=root2, \
                           root2_folder=root2_folder, \
                           path_list=all1)

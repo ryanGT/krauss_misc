@@ -75,7 +75,7 @@ def open_delimited_dialect(pathin, dialect=None, delim=None):
         elif delim == '\t':
             dialect = tabdelim
         else:
-            raise ValueError, "Not sure what to do with delimiter %s" % delim
+            raise(ValueError, "Not sure what to do with delimiter %s" % delim)
     alllines = _open_delimited(pathin, dialect)
     return alllines
 

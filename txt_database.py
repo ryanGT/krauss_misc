@@ -7,8 +7,15 @@ import txt_mixin, delimited_file_utils
 
 from IPython.core.debugger import Pdb
 
+def get_non_blanks(arrayin):
+    inds = where(arrayin != '')
+    if arrayin.ndim == 1:
+        inds = inds[0]
+    return arrayin[inds]
+
+
 def label_to_attr_name(label):
-    illegal_chars = [' ',':','/','\\','#','(',')']
+    illegal_chars = [' ',':','/','\\','#','(',')',',','-']
     attr = label
     for char in illegal_chars:
         attr = attr.replace(char, '_')
@@ -323,10 +330,12 @@ class txt_database(object):
         """I need to add an intermediate step to quote strings for csv
         compliance, i.e. 'this is one really, really, long cell with
         commas.'"""
-        data_out = prep_data_for_save(self.data)
-        misc_utils.dump_matrix(pathout, data_out, self.labels, \
-                               fmt='%s', delim=delim)
-
+        ## data_out = prep_data_for_save(self.data)
+        ## misc_utils.dump_matrix(pathout, data_out, self.labels, \
+        ##                        fmt='%s', delim=delim)
+        quoted_labels = ['"%s"' % item for item in self.labels]
+        txt_mixin.dump_delimited(pathout,self.data,delim=delim, \
+                                 labels=quoted_labels)
 
 
     def filter(self, boolvect):
@@ -348,6 +357,31 @@ class txt_database(object):
         data = self.data[row_inds,:]
         new_db = txt_database(data, self.labels)
         return new_db
+
+
+    def get_attr_by_label(self, label):
+        attr_name = label_to_attr_name(label)
+        if hasattr(self, attr_name):
+            vect = getattr(self, attr_name)
+            return vect
+        else:
+            raise ValueError('could not find column with this label: %s' % \
+                             label)
+
+
+    def get_matrix_from_label_list(self, labels):
+        out = None
+        for label in labels:
+            attr = label_to_attr_name(label)
+            col_ind = self.col_attr_dict[attr]
+            cur_data = self.data[:,col_ind]
+            if out is not None:
+                out = column_stack([out, cur_data])
+            else:
+                out = cur_data
+
+        return out
+
 
         
 
