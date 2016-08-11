@@ -62,4 +62,9 @@ weekly_all = ['git/research', \
 #'siue/admin/search_committes', \
 #'siue/admin/ug_catalog', \
 
-ignore_list = ['siue/raspi_grades/final_project_files']
+ignore_list = ['siue/raspi_grades/final_project_files', \
+               'teaching/fall_2016/345/prep/mac_video_recordings', \
+               'teaching/fall_2016/345/prep/windows_install_tutorial_presentations', \
+               'teaching/fall_2016/345/prep/windows_install_videos', \
+               ]
+
