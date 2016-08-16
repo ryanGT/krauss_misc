@@ -2,9 +2,9 @@ import os, rwkos
 
 filesep = os.path.sep
 
-src_base = '/Users/rkrauss'
+src_base = '/Users/kraussry'
 
-exclude_from_str = '--exclude-from=/Users/rkrauss/scripts/rsync_excludes.txt'
+exclude_from_str = '--exclude-from=/Users/kraussry/scripts/rsync_excludes.txt'
 
 def check_src(src_in):
     assert src_in.find(src_base) == 0, 'bad src: %s' % src_in
@@ -13,17 +13,18 @@ def check_dst(dst_in):
     assert dst_in.find('/Volumes/') == 0, 'bad dst: %s' % dst_in
     
     
-def rsync_one(src, dst, flags=['-rv',exclude_from_str]):
+def rsync_one(src, dst, flags=['-rv',exclude_from_str], \
+              droptrailingslash=True):
     check_src(src)
     check_dst(dst)
-    if src[-1] == filesep:
+    if droptrailingslash and src[-1] == filesep:
         src = src[0:-1]
         
     flag_str = ' '.join(flags)
     cmd = 'rsync %s %s %s' % (flag_str, src, dst)
-    #print('================')
-    #print(cmd)
-    #print('================')
+    print('================')
+    print(cmd)
+    print('================')
     os.system(cmd)
 
               
