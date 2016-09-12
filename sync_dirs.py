@@ -12,13 +12,15 @@ quick_all = ['scripts', \
              'elisp', \
              'teaching/fall_2016', \
              'Documents/Arduino', \
-             'siue/dan_h', \
-             'siue/raspi_quiz_solutions', \
-             'siue/grad_comp_forms', \
-             'siue/raspi_student_submissions', \
-             'siue/raspi_exam_feedback', \
-             'siue/travel_reimbursement', \
-             'siue/raspi_grades', \
+             'research/papers/ACC_2017_345_paper', \
+             'research/papers/krauss_main_bib.bib', \
+             #'siue/dan_h', \
+             #'siue/raspi_quiz_solutions', \
+             #'siue/grad_comp_forms', \
+             #'siue/raspi_student_submissions', \
+             #'siue/raspi_exam_feedback', \
+             #'siue/travel_reimbursement', \
+             #'siue/raspi_grades', \
              #'siue/Research/Proposals/internal', \
              #'siue/Research/presentations/ACC', \
              ]
@@ -63,8 +65,8 @@ weekly_all = ['git/research', \
 #'siue/admin/ug_catalog', \
 
 ignore_list = ['siue/raspi_grades/final_project_files', \
-               'teaching/fall_2016/345/prep/mac_video_recordings', \
-               'teaching/fall_2016/345/prep/windows_install_tutorial_presentations', \
-               'teaching/fall_2016/345/prep/windows_install_videos', \
+               'teaching/fall_2016/345/prep_345/mac_video_recordings', \
+               'teaching/fall_2016/345/prep_345/windows_install_tutorial_presentations', \
+               'teaching/fall_2016/345/prep_345/windows_install_videos', \
                ]
 

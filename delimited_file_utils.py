@@ -35,7 +35,7 @@ csv.register_dialect('mycsv', mycsv)
 
 
 def sniff(pathin, bytes=1000):
-    f = open(pathin)
+    f = open(pathin,'r', encoding='utf-16')
     mystr = f.read(1000)
     mysniff = csv.Sniffer()
     mylist = mystr.split('\n')
@@ -54,7 +54,7 @@ def sniff(pathin, bytes=1000):
 
 
 def _open_delimited(pathin, dialect):
-    reader = csv.reader(open(pathin,'rU'), dialect)
+    reader = csv.reader(open(pathin,'r', encoding='utf-16'), dialect)
     alllines = [row for row in reader]
     return alllines
 
