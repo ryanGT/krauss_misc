@@ -129,6 +129,8 @@ def clean_filename(pathin):
     fno, ext = os.path.splitext(filename)
     out = re.sub('\W','_', fno)
     out = re.sub('_+', '_', out)
+    if out[-1] == '_':
+        out = out[0:-1]
     return os.path.join(folder, out+ext)
 
 

@@ -10,10 +10,11 @@ quick_all = ['scripts', \
              '.gitignore', \
              '.emacs', \
              'elisp', \
-             'teaching/fall_2016', \
+             #'teaching/fall_2016', \
              'Documents/Arduino', \
              'research/papers/ACC_2017_345_paper', \
              'research/papers/krauss_main_bib.bib', \
+             'research/papers/ASEE_2017_345_346_paper', \
              #'siue/dan_h', \
              #'siue/raspi_quiz_solutions', \
              #'siue/grad_comp_forms', \

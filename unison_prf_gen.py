@@ -98,6 +98,7 @@ if __name__ == '__main__':
     ## gen4.go()
 
     mytuples = [('KRAUSS1_%s.prf','/Volumes/KRAUSS1/','gvsu_backup'), \
+                ('Backup_rwk_1_%s.prf','/Volumes/BACKUPRWK2/',None), \
                 ]
 
     for curtup in mytuples:

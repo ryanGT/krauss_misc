@@ -2,7 +2,7 @@ from numpy import *
 import misc_utils
 import numpy
 import copy
-
+import re
 import txt_mixin, delimited_file_utils
 
 from IPython.core.debugger import Pdb
@@ -15,7 +15,7 @@ def get_non_blanks(arrayin):
 
 
 def label_to_attr_name(label):
-    illegal_chars = [' ',':','/','\\','#','(',')',',','-']
+    illegal_chars = [' ',':','/','\\','#','(',')',',','-','[',']','|','.']
     attr = label
     for char in illegal_chars:
         attr = attr.replace(char, '_')
@@ -77,7 +77,7 @@ class db_row(object):
     def map_cols_to_attr(self):
         """make each column of self.data an attribute of the db
         instance."""
-        for attr, col_ind in self.col_attr_dict.iteritems():
+        for attr, col_ind in self.col_attr_dict.items():
             setattr(self, attr, self.row_data[col_ind])
 
     def __repr__(self):
@@ -133,6 +133,12 @@ class txt_database(object):
         inds = where(vect=='')[0]
         vect[inds] = '0'
         return vect
+
+
+    def _replace_commas_in_numbers(self,vect):
+        mylist = vect.tolist()
+        clean_list = [item.replace(',','') for item in mylist]
+        return array(clean_list)
 
 
     def convert_cols_to_float(self, collabels):
@@ -383,6 +389,12 @@ class txt_database(object):
         return out
 
 
+class txt_database_from_file(txt_database):
+    def __init__(self, filepath, skipcols=None):
+        data, labels = _open_txt_file(filepath, delim=',')
+        txt_database.__init__(self, data, labels)
+
+
         
 
 def _open_txt_file(pathin, delim='\t'):
@@ -401,4 +413,935 @@ def db_from_file(pathin, delim='\t'):
     data, labels = _open_txt_file(pathin, delim)
     mydb = txt_database(data, labels)
     return mydb
-                       
+
+
+# In order to check midterm grades, I want to find all quiz columns,
+# output them next to each other, and calculate an average where each
+# quiz is equally weighted.  Then I need to do the same for individual
+# assignments and group project grades.  How do I do this?
+#
+# Big Idea:
+#
+# - in order to estimate their midterm grades, I need their grade on
+# the midterm exam along with an estimate of their quiz ave, HW ave,
+# and project ave
+
+# - it seems like I need a column class
+# - this will be messy
+# - filter ungraded stuff
+#   - create a list of graded cols
+# - find quizzes first
+# - find project grades next
+# - whatever is left should be HW assignments
+#   - unless they are surveys or something
+
+
+
+def empty_strings_to_0(vect):
+    """Replace all empty strings with '0' so that they can be
+    converted to floats."""
+    inds = where(vect=='')[0]
+    vect[inds] = '0'
+    return vect
+
+
+def needs_grading_to_0(vect):
+    """Replace all empty strings with '0' so that they can be
+    converted to floats."""
+    inds = where(vect=='Needs Grading')[0]
+    vect[inds] = '0'
+    return vect
+
+
+def replace_commas_in_numbers(vect):
+    mylist = vect.tolist()
+    clean_list = [item.replace(',','') for item in mylist]
+    return array(clean_list)
+
+p_pts = re.compile("Total_Pts_([0-9]+)_")
+p_quiz = re.compile("^Quiz_([0-9]+)_")
+p_group = re.compile("^Group")
+p_project = re.compile("[Pp]roject_.*")
+p_weighted_total = re.compile("^Weighted_Total_")
+p_total = re.compile("^Total_")
+p_survey = re.compile("[Ss]urvey_.*")
+p_assign = re.compile("[Aa]ssign[ment]*_([0-9]+)_.*")
+p_la = re.compile("[Ll]earning_[Aa]ctivity_([0-9]+)_.*")
+p_extra_credit = re.compile("[Ee]xtra.*[Cc]redit")
+
+col_pat_dict = {"quiz":p_quiz, \
+                "group_assign":p_group, \
+                "project":p_project, \
+                "weighted_total":p_weighted_total, \
+                "total":p_total, \
+                "assignment":p_assign, \
+                "learning_activity":p_la, \
+                "survey":p_survey, \
+                "extra_credit":p_extra_credit, \
+                }
+
+pat_order = ["total","weighted_total",\
+             "survey", \
+             "group_assign", \
+             "quiz","project",\
+             "learning_activity",\
+             "assignment", \
+             "extra_credit"]
+
+
+
+# next steps:
+# - calc averages for columns (in bb_column class)
+# - group grades by classification (in bb_grade_checker)
+#   - only include graded columns
+# - find appropriate totals for groups
+# - average quizzes
+# - find total average for hw and project groups
+
+class bb_column(object):
+    """This class exists to help me classify columns from a blackboard
+    grade spreadsheet as either quiz, homework, group project,
+    midterm, ... and help me filter out stuff that isn't yet grade and
+    also determine appropriate totals and averages"""
+    def clean_grades(self):
+        self.list = self.vector.tolist()
+        self.emptygrades = self.list.count('')
+        self.needs_grading = self.list.count('Needs Grading')
+        cleanvecta = empty_strings_to_0(self.vector)
+        cleanvectb = replace_commas_in_numbers(cleanvecta)
+        cleanvect = needs_grading_to_0(cleanvectb)
+        # you cannot convert 'Needs Grading' to a float;
+        # but the length of the list cannot change if we are
+        # going to output grades
+        floatvect = cleanvect.astype(float)
+        self.floatvect = floatvect
+        
+        q = p_pts.search(self.attr_name)
+
+        percentages = None
+        
+        if q is not None:
+            p_poss = float(q.group(1))
+            if p_poss > 0:
+                percentages = (self.floatvect/p_poss)*100
+        else:
+            p_poss = None
+            
+            
+        ave = floatvect.mean()
+        mymax = floatvect.max()
+        mymin = floatvect.min()
+
+        self.p_poss = p_poss
+        self.ave = ave
+        self.max = mymax
+        self.min = mymin
+        self.percentages = percentages
+
+
+    def check_max(self):
+        if self.p_poss is None:
+            return True
+        elif self.max > self.p_poss:
+            return False
+        else:
+            return True
+        
+
+    def check_graded(self, N_tol=3, float_tol = 1.0e-4):
+        graded = True
+        if self.emptygrades > N_tol:
+            graded = False
+        elif self.ave < float_tol:
+            graded = False
+        elif self.max < float_tol:
+            graded = False
+        elif self.needs_grading > N_tol:
+            graded = False
+
+        self.graded = graded
+        return graded
+    
+
+    def classify(self):
+        self.classification = None
+
+        for key in pat_order:
+            pattern = col_pat_dict[key]
+            q = pattern.search(self.attr_name)
+            if q is not None:
+                self.classification = key
+                break
+
+
+        
+    def __init__(self, attr_name, vect_in, N_tol=3):
+        # N_tol refers to number of ungraded or empty grades in
+        # a column to consider it not yet graded
+        self.attr_name = attr_name
+        self.vector = copy.copy(vect_in)
+        self.clean_grades()                     
+        self.check_graded(N_tol=N_tol)
+        self.classify()
+        if self.classification != "extra_credit":
+            assert self.check_max(), "Max > possible: %s" % self.attr_name
+
+
+
+    def __repr__(self):
+        out_str = 'bb col: %s, class: %s' % (self.attr_name, \
+                                             self.classification)
+        return out_str
+
+
+
+def get_short_col_name(colname):
+    """Start with chopping off at _Total_Pts and then keep chopping"""
+    chop_list = ["_Total_Pts", "_from_", "_From_", "_due","_Due"]
+    outname = copy.copy(colname)
+
+    for pat in chop_list:
+        ind = outname.find(pat)
+        if ind > -1:
+            outname = outname[:ind]
+
+    return outname
+    
+
+class bb_grade_checker(txt_database_from_file):
+    def __init__(self, *args, **kwargs):
+        txt_database_from_file.__init__(self, *args, **kwargs)
+        if 'skipcols' in kwargs:
+            skipcols = kwargs['skipcols']
+        else:
+            skipcols = None
+        self._set_skip_cols(skipcols=skipcols)
+
+        
+    def _set_skip_cols(self, skipcols=None):
+        if skipcols is None:
+            skipcols = ['Last_Name', \
+                        'First_Name', \
+                        'Username', \
+                        'Student_ID', \
+                        'Last_Access', \
+                        'Availability', \
+                        ]
+        self.skipcols = skipcols
+        self.p_pts = re.compile("Total_Pts_([0-9]+)_")
+        
+
+    def check_one_col(self, attr, verbosity=1):
+        """check one bb column by pulling the Total_Pts out of the
+        label and comparing it to the min, max, and mean for the
+        column.  Care must be taken to handle empty grades and 'Needs
+        Grading'"""
+        myvect = getattr(self,attr)
+        column = bb_column(attr, myvect)
+        
+        ## if verbosity > 0:
+        ##     print('='*20)
+        ##     print('attr: %s' % attr)
+        ##     print('empty grades: %i' % emptygrades)
+        ##     print('Needs Grading: %i' % ng)
+        ##     if p_poss is None:
+        ##         print('points possible not found')
+        ##     else:
+        ##         print('points possible: %0.5g' % p_poss)
+        ##         print('ave: %0.5g' % ave)                
+        ##     print('max: %0.5g' % mymax)
+        ##     print('min: %0.5g' % mymin)
+
+            
+        ## return mydict
+
+
+    def create_cols(self, verbosity=1, N_tol=3):
+        cols = []
+        for attr in self.attr_names:
+            if attr not in self.skipcols:
+                if verbosity > 0:
+                    print('attr: %s' % attr)
+                myvect = getattr(self,attr)
+                column = bb_column(attr, myvect, N_tol=N_tol)
+                cols.append(column)
+
+        self.columns = cols
+                
+
+
+    def get_graded_cols_one_classification(self, classification):
+        matches = []
+
+        for col in self.columns:
+            if col.classification == classification:
+                if col.graded:
+                    matches.append(col)
+
+        setattr(self, classification, matches)
+        return matches
+
+
+    def find_quiz_average(self):
+        self.get_graded_cols_one_classification("quiz")
+        N_quizzes = len(self.quiz)
+
+        q_total = copy.copy(self.quiz[0].percentages)
+
+        for q in self.quiz[1:]:
+            q_total += q.percentages
+
+        q_ave = q_total/N_quizzes
+
+        self.quiz_average = q_ave
+        return q_ave
+
+
+    def find_hw_average(self):
+        self.get_graded_cols_one_classification("assignment")
+        self.get_graded_cols_one_classification("learning_activity")
+        hw_cols = self.assignment + self.learning_activity
+        self.hw_cols = hw_cols
+        
+        hw_total = copy.copy(hw_cols[0].floatvect)
+        hw_poss_total = hw_cols[0].p_poss
+
+        for col in hw_cols[1:]:
+            hw_total += col.floatvect
+            hw_poss_total += col.p_poss
+
+        self.hw_total = hw_total
+        self.hw_ave = (hw_total/hw_poss_total)*100
+        self.hw_poss_total = hw_poss_total
+        return self.hw_ave
+
+
+    def hw_report_data(self, short=False):
+        data = []
+        labels = []
+
+        if not short:
+            for col in self.hw_cols:
+                shortname = get_short_col_name(col.attr_name)
+                labels.append(shortname)
+                data.append(col.floatvect)
+
+        if not short:
+            data.append(self.hw_total)
+            labels.append('HW Total')
+
+        data.append(self.hw_ave)
+        labels.append('HW Ave (%i points possible)' % self.hw_poss_total)
+        
+        data_float = column_stack(data)
+        data_str = data_float.astype('S30')
+
+        out_mat = row_stack([labels, data_str])
+        #return data_float, labels
+        return out_mat
+
+
+    def quiz_report_data(self, short=False):
+        data = []
+        labels = []
+
+        if not short:
+            for col in self.quiz:
+                shortname = get_short_col_name(col.attr_name)
+                labels.append(shortname)
+                data.append(col.floatvect)
+
+            for col in self.quiz:
+                shortname = get_short_col_name(col.attr_name) + " %"
+                labels.append(shortname)
+                data.append(col.percentages)
+
+        data.append(self.quiz_average)
+        labels.append('Quiz Ave')
+
+        data_float = column_stack(data)
+        data_str = data_float.astype('S30')
+
+        out_mat = row_stack([labels, data_str])
+        #return data_float, labels
+        return out_mat
+
+
+    def find_project_average(self):
+        self.get_graded_cols_one_classification("project")
+        
+        project_total = copy.copy(self.project[0].floatvect)
+        project_poss_total = self.project[0].p_poss
+
+        for col in self.project[1:]:
+            project_total += col.floatvect
+            project_poss_total += col.p_poss
+
+        self.project_total = project_total
+        self.project_ave = (project_total/project_poss_total)*100
+        self.project_poss_total = project_poss_total
+        return self.project_ave
+
+        
+    def project_report_data(self, short=False):
+        data = []
+        labels = []
+
+
+        if not short:
+            for col in self.project:
+                shortname = get_short_col_name(col.attr_name)
+                labels.append(shortname)
+                data.append(col.floatvect)
+
+        if not short:
+            data.append(self.project_total)
+            labels.append('Project Total')
+
+        data.append(self.project_ave)
+        labels.append('Project Ave (%i points possible)' % \
+                               self.project_poss_total)
+
+        data_float = column_stack(data)
+        data_str = data_float.astype('S30')
+
+        out_mat = row_stack([labels, data_str])
+        #return data_float, labels
+        return out_mat
+
+
+    def find_column_with_start_match(self, pat, attr_set):
+        """Find a column whose name starts with pat and set that
+        column vector to self.attr_set"""
+        for attr in self.attr_names:
+            if attr.find(pat) == 0:
+                myvect = getattr(self, attr)
+                col = bb_column(attr, myvect)
+                setattr(self, attr_set, col)
+
+
+    def find_exam_2(self):
+        #Pdb().set_trace()
+        self.find_column_with_start_match("Exam_2", "exam_2")
+        
+
+    ## def find_midterm(self):
+    ##     for attr in self.attr_names:
+    ##         if attr.find("Midterm_Exam") == 0:
+    ##             myvect = getattr(self, attr)
+    ##             self.midterm_exam = bb_column(attr, myvect)
+
+
+    def find_midterm(self):
+        self.find_column_with_start_match("Midterm_Exam", "midterm_exam")
+
+
+    def estimate_grade_midpoint(self):
+        # Assignments and Learning Activities 20 %
+        # Quizzes 10 %
+        # Exams 40 %
+        # Project 30%
+        self.midpoint = 0.2*self.hw_ave + \
+                        0.1*self.quiz_average + \
+                        0.4*self.midterm_exam.floatvect + \
+                        0.3*self.project_ave
+        return self.midpoint
+    
+        
+    def big_report(self, short=False):
+        mat1 = self.hw_report_data(short=short)
+        mat2 = self.project_report_data(short=short)
+        matq = self.quiz_report_data(short=short)
+        name_data = self.data[:,0:4]
+        name_labels = self.labels[0:4]
+        start_data = row_stack([name_labels,name_data])
+        if not hasattr(self,"midterm_exam"):
+            self.find_midterm()
+        midterm_data = self.midterm_exam.floatvect.astype(str).tolist()
+        midterm2 = ["Midterm Exam"] + midterm_data
+        midterm_mat = atleast_2d(midterm2).T
+        self.estimate_grade_midpoint()
+        midpoint_data = self.midpoint.tolist()
+        midpoint2 = ["Midpoint Grade Estimate"] + midpoint_data
+        midpoint_mat = atleast_2d(midpoint2).T
+        data = column_stack([start_data,mat1,mat2,matq,midterm_mat, \
+                             midpoint_mat])
+        return data
+
+
+    def check_column_classification(self):
+        self.get_graded_cols_one_classification("quiz")
+        N_quizzes = len(self.quiz)
+
+        q_total = copy.copy(self.quiz[0].percentages)
+
+        for q in self.quiz[1:]:
+            q_total += q.percentages
+
+        q_ave = q_total/N_quizzes
+
+        self.quiz_average = q_ave
+        return q_ave
+
+
+    def find_hw_average(self):
+        self.get_graded_cols_one_classification("assignment")
+        self.get_graded_cols_one_classification("learning_activity")
+        hw_cols = self.assignment + self.learning_activity
+        self.hw_cols = hw_cols
+        
+        hw_total = copy.copy(hw_cols[0].floatvect)
+        hw_poss_total = hw_cols[0].p_poss
+
+        for col in hw_cols[1:]:
+            hw_total += col.floatvect
+            hw_poss_total += col.p_poss
+
+        self.hw_total = hw_total
+        self.hw_ave = (hw_total/hw_poss_total)*100
+        self.hw_poss_total = hw_poss_total
+        return self.hw_ave
+
+
+    def hw_report_data(self, short=False):
+        data = []
+        labels = []
+
+        if not short:
+            for col in self.hw_cols:
+                shortname = get_short_col_name(col.attr_name)
+                labels.append(shortname)
+                data.append(col.floatvect)
+
+        if not short:
+            data.append(self.hw_total)
+            labels.append('HW Total')
+
+        data.append(self.hw_ave)
+        labels.append('HW Ave (%i points possible)' % self.hw_poss_total)
+        
+        data_float = column_stack(data)
+        data_str = data_float.astype('S30')
+
+        out_mat = row_stack([labels, data_str])
+        #return data_float, labels
+        return out_mat
+
+
+    def quiz_report_data(self, short=False):
+        data = []
+        labels = []
+
+        if not short:
+            for col in self.quiz:
+                shortname = get_short_col_name(col.attr_name)
+                labels.append(shortname)
+                data.append(col.floatvect)
+
+            for col in self.quiz:
+                shortname = get_short_col_name(col.attr_name) + " %"
+                labels.append(shortname)
+                data.append(col.percentages)
+
+        data.append(self.quiz_average)
+        labels.append('Quiz Ave')
+
+        data_float = column_stack(data)
+        data_str = data_float.astype('S30')
+
+        out_mat = row_stack([labels, data_str])
+        #return data_float, labels
+        return out_mat
+
+
+    def find_project_average(self):
+        self.get_graded_cols_one_classification("project")
+        
+        project_total = copy.copy(self.project[0].floatvect)
+        project_poss_total = self.project[0].p_poss
+
+        for col in self.project[1:]:
+            project_total += col.floatvect
+            project_poss_total += col.p_poss
+
+        self.project_total = project_total
+        self.project_ave = (project_total/project_poss_total)*100
+        self.project_poss_total = project_poss_total
+        return self.project_ave
+
+        
+    def project_report_data(self, short=False):
+        data = []
+        labels = []
+
+
+        if not short:
+            for col in self.project:
+                shortname = get_short_col_name(col.attr_name)
+                labels.append(shortname)
+                data.append(col.floatvect)
+
+        if not short:
+            data.append(self.project_total)
+            labels.append('Project Total')
+
+        data.append(self.project_ave)
+        labels.append('Project Ave (%i points possible)' % \
+                               self.project_poss_total)
+
+        data_float = column_stack(data)
+        data_str = data_float.astype('S30')
+
+        out_mat = row_stack([labels, data_str])
+        #return data_float, labels
+        return out_mat
+
+
+    def find_midterm(self):
+        for attr in self.attr_names:
+            if attr.find("Midterm_Exam") == 0:
+                myvect = getattr(self, attr)
+                self.midterm_exam = bb_column(attr, myvect)
+
+
+    def estimate_grade_midpoint(self):
+        # Assignments and Learning Activities 20 %
+        # Quizzes 10 %
+        # Exams 40 %
+        # Project 30%
+        self.midpoint = 0.2*self.hw_ave + \
+                        0.1*self.quiz_average + \
+                        0.4*self.midterm_exam.floatvect + \
+                        0.3*self.project_ave
+        return self.midpoint
+    
+        
+    def big_report(self, short=False):
+        mat1 = self.hw_report_data(short=short)
+        mat2 = self.project_report_data(short=short)
+        matq = self.quiz_report_data(short=short)
+        name_data = self.data[:,0:4]
+        name_labels = self.labels[0:4]
+        start_data = row_stack([name_labels,name_data])
+        if not hasattr(self,"midterm_exam"):
+            self.find_midterm()
+        midterm_data = self.midterm_exam.floatvect.astype(str).tolist()
+        midterm2 = ["Midterm Exam"] + midterm_data
+        midterm_mat = atleast_2d(midterm2).T
+        self.estimate_grade_midpoint()
+        midpoint_data = self.midpoint.tolist()
+        midpoint2 = ["Midpoint Grade Estimate"] + midpoint_data
+        midpoint_mat = atleast_2d(midpoint2).T
+        data = column_stack([start_data,mat1,mat2,matq,midterm_mat, \
+                             midpoint_mat])
+        return data
+
+
+    def check_column_classification(self):
+        self.get_graded_cols_one_classification("quiz")
+        N_quizzes = len(self.quiz)
+
+        q_total = copy.copy(self.quiz[0].percentages)
+
+        for q in self.quiz[1:]:
+            q_total += q.percentages
+
+        q_ave = q_total/N_quizzes
+
+        self.quiz_average = q_ave
+        return q_ave
+
+
+    def find_hw_average(self):
+        self.get_graded_cols_one_classification("assignment")
+        self.get_graded_cols_one_classification("learning_activity")
+        hw_cols = self.assignment + self.learning_activity
+        self.hw_cols = hw_cols
+        
+        hw_total = copy.copy(hw_cols[0].floatvect)
+        hw_poss_total = hw_cols[0].p_poss
+
+        for col in hw_cols[1:]:
+            hw_total += col.floatvect
+            hw_poss_total += col.p_poss
+
+        self.hw_total = hw_total
+        self.hw_ave = (hw_total/hw_poss_total)*100
+        self.hw_poss_total = hw_poss_total
+        return self.hw_ave
+
+
+    def hw_report_data(self, short=False):
+        data = []
+        labels = []
+
+        if not short:
+            for col in self.hw_cols:
+                shortname = get_short_col_name(col.attr_name)
+                labels.append(shortname)
+                data.append(col.floatvect)
+
+        if not short:
+            data.append(self.hw_total)
+            labels.append('HW Total')
+
+        data.append(self.hw_ave)
+        labels.append('HW Ave (%i points possible)' % self.hw_poss_total)
+        
+        data_float = column_stack(data)
+        data_str = data_float.astype('S30')
+
+        out_mat = row_stack([labels, data_str])
+        #return data_float, labels
+        return out_mat
+
+
+    def quiz_report_data(self, short=False):
+        data = []
+        labels = []
+
+        if not short:
+            for col in self.quiz:
+                shortname = get_short_col_name(col.attr_name)
+                labels.append(shortname)
+                data.append(col.floatvect)
+
+            for col in self.quiz:
+                shortname = get_short_col_name(col.attr_name) + " %"
+                labels.append(shortname)
+                data.append(col.percentages)
+
+        data.append(self.quiz_average)
+        labels.append('Quiz Ave')
+
+        data_float = column_stack(data)
+        data_str = data_float.astype('S30')
+
+        out_mat = row_stack([labels, data_str])
+        #return data_float, labels
+        return out_mat
+
+
+    def find_project_average(self):
+        self.get_graded_cols_one_classification("project")
+        
+        project_total = copy.copy(self.project[0].floatvect)
+        project_poss_total = self.project[0].p_poss
+
+        for col in self.project[1:]:
+            project_total += col.floatvect
+            project_poss_total += col.p_poss
+
+        self.project_total = project_total
+        self.project_ave = (project_total/project_poss_total)*100
+        self.project_poss_total = project_poss_total
+        return self.project_ave
+
+        
+    def project_report_data(self, short=False):
+        data = []
+        labels = []
+
+
+        if not short:
+            for col in self.project:
+                shortname = get_short_col_name(col.attr_name)
+                labels.append(shortname)
+                data.append(col.floatvect)
+
+        if not short:
+            data.append(self.project_total)
+            labels.append('Project Total')
+
+        data.append(self.project_ave)
+        labels.append('Project Ave (%i points possible)' % \
+                               self.project_poss_total)
+
+        data_float = column_stack(data)
+        data_str = data_float.astype('S30')
+
+        out_mat = row_stack([labels, data_str])
+        #return data_float, labels
+        return out_mat
+
+
+    def find_midterm(self):
+        for attr in self.attr_names:
+            if attr.find("Midterm_Exam") == 0:
+                myvect = getattr(self, attr)
+                self.midterm_exam = bb_column(attr, myvect)
+
+
+    def estimate_grade_midpoint(self):
+        # Assignments and Learning Activities 20 %
+        # Quizzes 10 %
+        # Exams 40 %
+        # Project 30%
+        self.midpoint = 0.2*self.hw_ave + \
+                        0.1*self.quiz_average + \
+                        0.4*self.midterm_exam.floatvect + \
+                        0.3*self.project_ave
+        return self.midpoint
+    
+        
+    def big_report(self, short=False):
+        mat1 = self.hw_report_data(short=short)
+        mat2 = self.project_report_data(short=short)
+        matq = self.quiz_report_data(short=short)
+        name_data = self.data[:,0:4]
+        name_labels = self.labels[0:4]
+        start_data = row_stack([name_labels,name_data])
+        if not hasattr(self,"midterm_exam"):
+            self.find_midterm()
+        midterm_data = self.midterm_exam.floatvect.astype(str).tolist()
+        midterm2 = ["Midterm Exam"] + midterm_data
+        midterm_mat = atleast_2d(midterm2).T
+        self.estimate_grade_midpoint()
+        midpoint_data = self.midpoint.tolist()
+        midpoint2 = ["Midpoint Grade Estimate"] + midpoint_data
+        midpoint_mat = atleast_2d(midpoint2).T
+        data = column_stack([start_data,mat1,mat2,matq,midterm_mat, \
+                             midpoint_mat])
+        return data
+
+
+    def check_column_classification(self, skip_list=[]):
+
+        all_attrs = copy.copy(self.attr_names)
+        
+        for key in pat_order:
+            cols = self.get_graded_cols_one_classification(key)
+
+            if cols:
+                print(key)
+                print("-"*20)
+
+            for col in cols:
+                print(col.attr_name)
+                all_attrs.remove(col.attr_name)
+
+            print('')
+
+
+        for item in skip_list:
+            if item in all_attrs:
+                all_attrs.remove(item)
+                
+                
+        print('')
+        print('Not used:')
+        print('-'*20)
+
+        for item in all_attrs:
+            print(item)
+
+
+        return all_attrs
+
+
+class bb_107_final_grade_calculator(bb_grade_checker):
+    def project_report_data(self, short=False):
+        # The card game is the only project score for 107 in W17,
+        # everything else is a group grade
+        data = []
+        labels = []
+
+
+        for col in self.project:
+            shortname = get_short_col_name(col.attr_name)
+            labels.append(shortname)
+            data.append(col.floatvect)
+
+        data_float = column_stack(data)
+        data_str = data_float.astype('S30')
+
+        out_mat = row_stack([labels, data_str])
+        #return data_float, labels
+        return out_mat
+
+
+    def find_group_average(self):
+        self.get_graded_cols_one_classification("group_assign")
+
+        group_total = copy.copy(self.group_assign[0].floatvect)
+        group_poss_total = self.group_assign[0].p_poss
+
+        for col in self.group_assign[1:]:
+            group_total += col.floatvect
+            group_poss_total += col.p_poss
+
+        self.group_total = group_total
+        self.group_ave = (group_total/group_poss_total)*100
+        self.group_poss_total = group_poss_total
+        return self.group_ave
+
+
+    def group_report_data(self, short=False):
+        data = []
+        labels = []
+
+
+        if not short:
+            for col in self.group_assign:
+                shortname = get_short_col_name(col.attr_name)
+                labels.append(shortname)
+                data.append(col.floatvect)
+
+        data.append(self.group_total)
+        labels.append('Group Total (%i points possible)' % \
+                               self.group_poss_total)
+
+        data.append(self.group_ave)
+        labels.append('Group Ave (%i points possible)' % \
+                               self.group_poss_total)
+
+        data_float = column_stack(data)
+        data_str = data_float.astype('S30')
+
+        out_mat = row_stack([labels, data_str])
+        #return data_float, labels
+        return out_mat
+
+
+    def attr_to_mat(self, attr, label):
+        col = getattr(self, attr)
+        vect = col.floatvect
+        mylist = vect.astype(str).tolist()
+        list_w_label = [label] + mylist
+        mymat = atleast_2d(list_w_label).T
+        return mymat
+
+
+    def big_report(self, short=False):
+        mat1 = self.hw_report_data(short=short)
+        mat2 = self.project_report_data(short=short)
+        matq = self.quiz_report_data(short=short)
+        matg = self.group_report_data(short=short)
+        name_data = self.data[:,0:4]
+        name_labels = self.labels[0:4]
+        start_data = row_stack([name_labels,name_data])
+
+        # --> Get midterm and exam 2 into big_report
+        
+        if not hasattr(self,"midterm_exam"):
+             self.find_midterm()
+
+        midpoint_mat = self.attr_to_mat("midterm_exam", "Midterm Exam")
+        
+        if not hasattr(self, "exam_2"):
+            self.find_exam_2()
+
+        e2_mat = self.attr_to_mat("exam_2","Exam 2")
+        
+        ## self.estimate_grade_midpoint()
+        ## midpoint_data = self.midpoint.tolist()
+        ## midpoint2 = ["Midpoint Grade Estimate"] + midpoint_data
+        ## midpoint_mat = atleast_2d(midpoint2).T
+        ## data = column_stack([start_data,mat1,mat2,matq,midterm_mat, \
+        ##                      midpoint_mat])
+        data = column_stack([start_data,mat1,mat2,matq,matg, \
+                             midpoint_mat, e2_mat])
+        return data
+
+    # To do:
+    # - check how I calculate the quiz average

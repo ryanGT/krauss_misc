@@ -14,9 +14,10 @@ def check_dst(dst_in):
     
     
 def rsync_one(src, dst, flags=['-rv',exclude_from_str], \
-              droptrailingslash=True):
+              droptrailingslash=True, verify_dst=True):
     check_src(src)
-    check_dst(dst)
+    if verify_dst:
+        check_dst(dst)
     if droptrailingslash and src[-1] == filesep:
         src = src[0:-1]
         

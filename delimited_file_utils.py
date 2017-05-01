@@ -33,10 +33,22 @@ class mycsv(csv.Dialect):
 
 csv.register_dialect('mycsv', mycsv)
 
+encodings_to_try = ['latin-1','utf-16','utf-16-le','utf-16-be']
 
 def sniff(pathin, bytes=1000):
-    f = open(pathin,'r', encoding='utf-16')
-    mystr = f.read(1000)
+    try:
+        f = open(pathin,'r')#, encoding='utf-16')
+        mystr = f.read(1000)
+    except:
+        N = len(encodings_to_try)
+        for i in range(N):
+            try:
+                f = open(pathin,'r', encoding=encodings_to_try[i])
+                mystr = f.read(1000)
+                break
+            except:
+                pass
+            
     mysniff = csv.Sniffer()
     mylist = mystr.split('\n')
     if mylist[0].find('\t') > -1:
@@ -54,8 +66,17 @@ def sniff(pathin, bytes=1000):
 
 
 def _open_delimited(pathin, dialect):
-    reader = csv.reader(open(pathin,'r', encoding='utf-16'), dialect)
-    alllines = [row for row in reader]
+    try:
+        reader = csv.reader(open(pathin,'r'), dialect)
+        alllines = [row for row in reader]
+    except:
+        try:
+            reader = csv.reader(open(pathin,'r', encoding='latin-1'), dialect)
+            alllines = [row for row in reader]
+        except:
+            reader = csv.reader(open(pathin,'r', encoding='utf-16'), dialect)
+            alllines = [row for row in reader]
+            
     return alllines
 
     
