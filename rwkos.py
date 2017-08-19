@@ -5,6 +5,25 @@ import shutil
 
 date_pat = re.compile('(\d\d)_(\d\d)_(\d\d)/*$')
 
+def longest_match(file1, file2):
+    """Find the longest string that matches the start of file1 and
+    file2.  Used for renaming blackboard download files"""
+    i = 1
+
+    N = len(file1)
+
+    while i < N:
+        if file1[0:i] != file2[0:i]:
+            break
+        else:
+            i += 1
+
+    if i > 1:
+        return file1[0:i-1]
+    else:
+        return None
+    
+    
 def check_lecture_dir(dir_in):
     """Check to see if the current directory ends in mm_dd_yy and if
     so figure out how to determine the lecture title of the form
@@ -120,6 +139,17 @@ def split_list_of_paths(pathlist):
         folders.append(curfolder)
     return folders, names
 
+
+def clean_fno_or_folder(fno):
+    """Clean something assumed to not have an extension; could also be
+    used for folders"""
+    fno = fno.replace('.','_')
+    out = re.sub('\W','_', fno)
+    out = re.sub('_+', '_', out)
+    if out[-1] == '_':
+        out = out[0:-1]
+    return out
+
 def clean_filename(pathin):
     """Remove all non-alphanumeric characters (including spaces) from
     pathin, replacing with an underscore (also replaces multiple
@@ -127,10 +157,7 @@ def clean_filename(pathin):
     the filename."""
     folder, filename = os.path.split(pathin)
     fno, ext = os.path.splitext(filename)
-    out = re.sub('\W','_', fno)
-    out = re.sub('_+', '_', out)
-    if out[-1] == '_':
-        out = out[0:-1]
+    out = _clean_fno_or_folder(fno)
     return os.path.join(folder, out+ext)
 
 

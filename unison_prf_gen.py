@@ -96,9 +96,11 @@ if __name__ == '__main__':
     ##                      root2_folder=None, \
     ##                      path_list=all1)
     ## gen4.go()
+    #/gvsu_backup
 
     mytuples = [('KRAUSS1_%s.prf','/Volumes/KRAUSS1/','gvsu_backup'), \
                 ('Backup_rwk_1_%s.prf','/Volumes/BACKUPRWK2/',None), \
+                ('KRAUSSWDFAT_%s.prf','/Volumes/KraussWDFat/','gvsu_backup'), \
                 ]
 
     for curtup in mytuples:

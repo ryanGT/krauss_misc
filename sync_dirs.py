@@ -11,6 +11,8 @@ quick_all = ['scripts', \
              '.emacs', \
              'elisp', \
              #'teaching/fall_2016', \
+             'teaching/summer_2017', \
+             #'teaching/general_class_prep', \
              'Documents/Arduino', \
              'research/papers/ACC_2017_345_paper', \
              'research/papers/krauss_main_bib.bib', \
@@ -49,6 +51,8 @@ weekly_all = ['git/research', \
               'git/restutils', \
               #'git/rpi_arduino_communication', \
               'git/rst2beamer', \
+              'teaching/general_class_prep', \
+              'teaching/winter_2017', \
               #'git/wxpython_guis', \
               #'git/pygtk_guis', \
               #'git/pygtk_utils', \
