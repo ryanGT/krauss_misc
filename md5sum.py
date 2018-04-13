@@ -29,4 +29,4 @@ def md5sum(fname):
 # if invoked on command line, print md5 hashes of specified files.
 if __name__ == '__main__':
     for fname in sys.argv[1:]:
-        print '%32s  %s' % (md5sum(fname), fname)
+        print('%32s  %s' % (md5sum(fname), fname))

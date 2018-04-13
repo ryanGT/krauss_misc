@@ -157,7 +157,7 @@ def clean_filename(pathin):
     the filename."""
     folder, filename = os.path.split(pathin)
     fno, ext = os.path.splitext(filename)
-    out = _clean_fno_or_folder(fno)
+    out = clean_fno_or_folder(fno)
     return os.path.join(folder, out+ext)
 
 

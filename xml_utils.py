@@ -198,8 +198,8 @@ def find_child(element, name):
     if found:
         return child
     else:
-        raise ValueError, "did not find child with tag name %s in %s" % \
-              (name, element.getchildren())
+        raise ValueError("did not find child with tag name %s in %s" % \
+              (name, element.getchildren()))
 
 
 def find_child_if_it_exists(element, name):
@@ -347,4 +347,4 @@ def str_to_bool(str_in):
     elif str_in.lower() == 'true':
         return True
     else:
-        raise ValueError, 'Cannot convert this string to a bool: %s' % str_in
+        raise ValueError('Cannot convert this string to a bool: %s' % str_in)

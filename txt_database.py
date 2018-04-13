@@ -525,8 +525,25 @@ class bb_column(object):
     grade spreadsheet as either quiz, homework, group project,
     midterm, ... and help me filter out stuff that isn't yet grade and
     also determine appropriate totals and averages"""
+    def clean_needs_grading(self):
+        """Sometimes items are listed as Need Grading(####), i.e. they
+        seem to have a suggested grade or something.  This seems to
+        come from having one attempt graded and others ignored when
+        students upload multiple times.  So, I need to replace Needs
+        Grading(##) with the score in the paranthesis."""
+
+        needs_str = "Needs Grading"
+        pat = re.compile("Needs Grading *\\(([0-9.]+)\\)")
+        
+        for i, item in enumerate(self.list):
+            q = pat.search(item)
+            if q:
+                self.list[i] = q.group(1)
+                self.vector[i] = q.group(1)
+                
     def clean_grades(self):
         self.list = self.vector.tolist()
+        self.clean_needs_grading()
         self.emptygrades = self.list.count('')
         self.needs_grading = self.list.count('Needs Grading')
         cleanvecta = empty_strings_to_0(self.vector)
@@ -866,9 +883,8 @@ class bb_grade_checker(txt_database_from_file):
     ##             self.midterm_exam = bb_column(attr, myvect)
 
 
-    def find_midterm(self):
-        self.find_column_with_start_match("Midterm_Exam", "midterm_exam")
-
+    ## def find_midterm(self):
+    ##     self.find_column_with_start_match("Midterm_Exam", "midterm_exam")
 
     def estimate_grade_midpoint(self):
         # Assignments and Learning Activities 20 %
@@ -877,30 +893,18 @@ class bb_grade_checker(txt_database_from_file):
         # Project 30%
         self.midpoint = 0.2*self.hw_ave + \
                         0.1*self.quiz_average + \
-                        0.4*self.midterm_exam.floatvect + \
-                        0.3*self.project_ave
+                        0.4*self.midterm_exam.floatvect
+        denom = 0.7
+        
+        if self.has_project:
+            self.midpoint += 0.3*self.project_ave
+            denom = 1.0
+
+        self.midpoint = self.midpoint/denom
         return self.midpoint
+
     
         
-    def big_report(self, short=False):
-        mat1 = self.hw_report_data(short=short)
-        mat2 = self.project_report_data(short=short)
-        matq = self.quiz_report_data(short=short)
-        name_data = self.data[:,0:4]
-        name_labels = self.labels[0:4]
-        start_data = row_stack([name_labels,name_data])
-        if not hasattr(self,"midterm_exam"):
-            self.find_midterm()
-        midterm_data = self.midterm_exam.floatvect.astype(str).tolist()
-        midterm2 = ["Midterm Exam"] + midterm_data
-        midterm_mat = atleast_2d(midterm2).T
-        self.estimate_grade_midpoint()
-        midpoint_data = self.midpoint.tolist()
-        midpoint2 = ["Midpoint Grade Estimate"] + midpoint_data
-        midpoint_mat = atleast_2d(midpoint2).T
-        data = column_stack([start_data,mat1,mat2,matq,midterm_mat, \
-                             midpoint_mat])
-        return data
 
 
     def check_column_classification(self):
@@ -1032,46 +1036,20 @@ class bb_grade_checker(txt_database_from_file):
 
 
     def find_midterm(self):
+        found = False
         for attr in self.attr_names:
-            if attr.find("Midterm_Exam") == 0:
+            if (attr.find("Midterm_Exam") == 0) or (attr.find("Exam_1")==0):
                 myvect = getattr(self, attr)
                 self.midterm_exam = bb_column(attr, myvect, \
                                               pat_order=self.pat_order)
+                found = True
+                print('found')
+                break
 
+        if not found:
+            print('did not find a midterm grade')
 
-    def estimate_grade_midpoint(self):
-        # Assignments and Learning Activities 20 %
-        # Quizzes 10 %
-        # Exams 40 %
-        # Project 30%
-        self.midpoint = 0.2*self.hw_ave + \
-                        0.1*self.quiz_average + \
-                        0.4*self.midterm_exam.floatvect + \
-                        0.3*self.project_ave
-        return self.midpoint
-    
         
-    def big_report(self, short=False):
-        mat1 = self.hw_report_data(short=short)
-        mat2 = self.project_report_data(short=short)
-        matq = self.quiz_report_data(short=short)
-        name_data = self.data[:,0:4]
-        name_labels = self.labels[0:4]
-        start_data = row_stack([name_labels,name_data])
-        if not hasattr(self,"midterm_exam"):
-            self.find_midterm()
-        midterm_data = self.midterm_exam.floatvect.astype(str).tolist()
-        midterm2 = ["Midterm Exam"] + midterm_data
-        midterm_mat = atleast_2d(midterm2).T
-        self.estimate_grade_midpoint()
-        midpoint_data = self.midpoint.tolist()
-        midpoint2 = ["Midpoint Grade Estimate"] + midpoint_data
-        midpoint_mat = atleast_2d(midpoint2).T
-        data = column_stack([start_data,mat1,mat2,matq,midterm_mat, \
-                             midpoint_mat])
-        return data
-
-
     def check_column_classification(self):
         self.get_graded_cols_one_classification("quiz")
         N_quizzes = len(self.quiz)
@@ -1158,7 +1136,11 @@ class bb_grade_checker(txt_database_from_file):
 
 
     def find_project_average(self):
-        self.get_graded_cols_one_classification("project")
+        self.has_project = True
+        proj_cols = self.get_graded_cols_one_classification("project")
+        if len(proj_cols) == 0:
+            self.has_project = False
+            return
         
         project_total = copy.copy(self.project[0].floatvect)
         project_poss_total = self.project[0].p_poss
@@ -1200,29 +1182,18 @@ class bb_grade_checker(txt_database_from_file):
         return out_mat
 
 
-    def find_midterm(self):
-        for attr in self.attr_names:
-            if attr.find("Midterm_Exam") == 0:
-                myvect = getattr(self, attr)
-                self.midterm_exam = bb_column(attr, myvect, \
-                                              pat_order=self.pat_order)
+    ## def find_midterm(self):
+    ##     for attr in self.attr_names:
+    ##         if attr.find("Midterm_Exam") == 0:
+    ##             myvect = getattr(self, attr)
+    ##             self.midterm_exam = bb_column(attr, myvect, \
+    ##                                           pat_order=self.pat_order)
 
 
-    def estimate_grade_midpoint(self):
-        # Assignments and Learning Activities 20 %
-        # Quizzes 10 %
-        # Exams 40 %
-        # Project 30%
-        self.midpoint = 0.2*self.hw_ave + \
-                        0.1*self.quiz_average + \
-                        0.4*self.midterm_exam.floatvect + \
-                        0.3*self.project_ave
-        return self.midpoint
-    
-        
     def big_report(self, short=False):
         mat1 = self.hw_report_data(short=short)
-        mat2 = self.project_report_data(short=short)
+        if self.has_project:
+            mat2 = self.project_report_data(short=short)
         matq = self.quiz_report_data(short=short)
         name_data = self.data[:,0:4]
         name_labels = self.labels[0:4]
@@ -1230,14 +1201,18 @@ class bb_grade_checker(txt_database_from_file):
         if not hasattr(self,"midterm_exam"):
             self.find_midterm()
         midterm_data = self.midterm_exam.floatvect.astype(str).tolist()
-        midterm2 = ["Midterm Exam"] + midterm_data
+        midterm2 = ["Exam 1"] + midterm_data
         midterm_mat = atleast_2d(midterm2).T
         self.estimate_grade_midpoint()
         midpoint_data = self.midpoint.tolist()
         midpoint2 = ["Midpoint Grade Estimate"] + midpoint_data
         midpoint_mat = atleast_2d(midpoint2).T
-        data = column_stack([start_data,mat1,mat2,matq,midterm_mat, \
-                             midpoint_mat])
+        if self.has_project:
+            data = column_stack([start_data,mat1,mat2,matq,midterm_mat, \
+                                 midpoint_mat])
+        else:
+            data = column_stack([start_data,mat1,matq,midterm_mat, \
+                                 midpoint_mat])            
         return data
 
 
@@ -1422,8 +1397,15 @@ class bb_445_final_grade_helper(bb_107_final_grade_calculator):
         # Project 30%
         self.midpoint = 0.2*self.hw_ave + \
                         0.1*self.quiz_average + \
-                        0.4*self.midterm_exam.floatvect + \
-                        0.3*self.project_ave
+                        0.4*self.midterm_exam.floatvect
+        denom = 0.7
+
+        if self.has_project:
+            self.midpoint += 0.3*self.project_ave
+            denom = 1.0
+            
+        self.midpoint = self.midpoint/denom
+
         return self.midpoint
     
         

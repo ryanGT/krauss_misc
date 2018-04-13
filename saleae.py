@@ -327,6 +327,48 @@ class arduino_saleae_comp(object):
 
 
 
+    def plot_side_by_side_hist(self, attr1, attr2, label_case=1, \
+                               nbins=20, xticks=None, \
+                               save=False, suffix=None,
+                               labels=None):
+        if label_case == 1:
+            xlabel = 'Time (ms)'
+        elif label_case == 2:
+            xlabel = 'Percent Difference'
+
+        data1 = getattr(self, attr1)
+        data2 = getattr(self, attr2)
+        
+        shift_list = ['dtA','dt2A']
+
+        if attr1 in shift_list:
+            data1 = data1[1:]
+        if attr2 in shift_list:
+            data2 = data2[1:]
+
+
+        data = np.column_stack([data1,data2])
+
+        plt.figure()
+        
+        n, bins, patches = plt.hist(data, nbins)#, alpha=0.5)
+        #plt.hist(data2, bins, alpha=0.5)
+
+        plt.ylabel('Frequency of Occurence')
+        plt.xlabel(xlabel)
+
+        if labels is not None:
+            plt.legend(labels)
+            
+        if xticks is not None:
+            plt.xticks(xticks)
+
+        if save:
+            assert suffix is not None, \
+                   "you must pass in a filename suffix when saving"
+            self.save_fig(suffix)
+
+        
     def get_fig_path(self, suffix):
         fn = 'test_%0.3d_%s.eps' % (self.test_num, suffix)
         figpath = os.path.join('figs', fn)

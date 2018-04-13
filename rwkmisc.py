@@ -10,7 +10,7 @@ import copy
 #from IPython.core.debugger import Pdb
 #mytrace=Pdb().set_trace
 
-import cPickle
+import pickle
 
 def get_date_str():
     date_str = time.strftime('%m_%d_%y')
@@ -66,16 +66,16 @@ def PrintToScreen(listin, globals):
 
 
 def SavePickle(mydict, filepath, protocol=2):
-    """Dump dictionary mydict to a Pickle file filepath using cPickle,
+    """Dump dictionary mydict to a Pickle file filepath using pickle,
     protocol=2."""
     mypkl = open(filepath,'wb')
-    cPickle.dump(mydict, mypkl, protocol=protocol)
+    pickle.dump(mydict, mypkl, protocol=protocol)
     mypkl.close()
 
 
 def LoadPickle(filepath):
     mypkl = open(filepath,'rb')
-    mydict = cPickle.load(mypkl)
+    mydict = pickle.load(mypkl)
     mypkl.close()
     return mydict
 
@@ -642,7 +642,7 @@ def SymstrMattoMaxima(matin, symname):
 def rflat(seq2):
     seq = []
     for entry in seq2:
-	if seqin([entry]):
+        if seqin([entry]):
             seq.extend([i for i in entry])
         else:
             seq.append(entry)
