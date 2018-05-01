@@ -15,7 +15,7 @@ def get_non_blanks(arrayin):
 
 
 def label_to_attr_name(label):
-    illegal_chars = [' ',':','/','\\','#','(',')',',','-','[',']','|','.']
+    illegal_chars = [' ',':','/','\\','#','(',')',',','-','[',']','|','.','%']
     attr = label
     for char in illegal_chars:
         attr = attr.replace(char, '_')
