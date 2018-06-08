@@ -44,7 +44,22 @@ def mysave(path_in, fi=None, ext='.eps', dpi=100, pdfcrop=1):
             print(cmd)
             os.system(cmd)
 
-
+def save_and_crop_png(path_in, fi=None, dpi=450, pad_and_resize=True, \
+                      clean=True, width=1600, height=1000):
+    myfig = _get_fig(fi)
+    mplutil.mysave(path_in, myfig, ext='.png', dpi=dpi)
+    cmd = 'mytrim.py %s' % path_in
+    os.system(cmd)
+    if pad_and_resize:
+        fno, ext = os.path.splitext(path_in)
+        fn2 = fno +'_trimmed.png'
+        cmd2 = 'resize_and_pad_image_for_jupyter_slides.py %s -w %i --height %i' % \
+               (fn2, width, height)
+        os.system(cmd2)
+        if clean:
+            os.remove(fn2)
+    if clean:
+        os.remove(path_in)
 
 
 def plot_cols(t, mat, fi=1, clear=True, leg=None, ylabel=None, \
