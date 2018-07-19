@@ -182,6 +182,7 @@ class txt_list(list):
             line = p.sub(reppat, line)
             self[n] = line
 
+            
     def find_before(self, pat1, pat2, usere=True, \
                     max_N=10, match=False, start_ind=0):
         inds = self.findallre(pat1, match=match, start_ind=start_ind)
