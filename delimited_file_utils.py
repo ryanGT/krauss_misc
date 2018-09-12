@@ -1,4 +1,4 @@
-import csv
+import csv, os
 from numpy import array
 from scipy import stats
 """I have been frustrated trying to open certain csv files and convert
@@ -36,6 +36,8 @@ csv.register_dialect('mycsv', mycsv)
 encodings_to_try = ['latin-1','utf-16','utf-16-le','utf-16-be']
 
 def sniff(pathin, bytes=1000):
+    if not os.path.exists(pathin):
+        return mycsv
     try:
         f = open(pathin,'r')#, encoding='utf-16')
         mystr = f.read(1000)
