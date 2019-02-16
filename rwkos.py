@@ -150,12 +150,18 @@ def clean_fno_or_folder(fno):
         out = out[0:-1]
     return out
 
-def clean_filename(pathin):
+def clean_filename(pathin, split=True):
     """Remove all non-alphanumeric characters (including spaces) from
     pathin, replacing with an underscore (also replaces multiple
     underscores with just one).  Does not mess with the folder, only
-    the filename."""
-    folder, filename = os.path.split(pathin)
+    the filename if split is True.  If split is False, assume pathin
+    is a filename and replace forward slashes as well.
+    """
+    if split:
+        folder, filename = os.path.split(pathin)
+    else:
+        folder = ""
+        filename = pathin
     fno, ext = os.path.splitext(filename)
     out = clean_fno_or_folder(fno)
     return os.path.join(folder, out+ext)

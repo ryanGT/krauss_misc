@@ -132,8 +132,9 @@ class txt_list(list):
             return None
 
 
-    def findnext(self, pattern, ind=0):
-        return self._find(pattern, start_ind=ind, only_one=True)
+    def findnext(self, pattern, ind=0, forcestart=0):
+        return self._find(pattern, start_ind=ind, only_one=True, \
+                          forcestart=forcestart)
     
 ##         inds = self.findall(pattern)
 ##         filtlist = [item for item in inds if item >= ind]
@@ -227,8 +228,71 @@ class txt_list(list):
                                     max_N=max_N, match=match, \
                                     start_ind=start_ind)
         self[N2] = newline
+
+
+    def is_blank(self, ind):
+        test_line = self[ind]
+        test_str = test_line.strip()
+        return not bool(test_str)
+
+    
+    def delete_blanks_at_ind(self, ind):
+        for i in range(5):
+            if self.is_blank(ind):
+                self.pop(ind)
+            else:
+                break    
+
+
+    def one_blank_below(self, ind):
+        """Ensure that there is exactly one blank line below ind.  This is
+           used when inserting google drive links into markdown
+           presentations, for example.
+
+           But, if ind is the last line, just don't worry about it.
+        """
+        N = len(self)
+        if ind >= N-1:
+            # don't worry about it
+            return
+        if not self.is_blank(ind+1):
+            self.insert(ind+1,'')
+            # there should be no need to check ind+2, because we just
+            # pushed a non-empty line down there
+            return
+
+        self.delete_blanks_at_ind(ind+2)
+
+
+    def delete_blanks_above_ind(self, ind):
+        """while self[ind-1] is blank, pop it and then decrement ind, but do
+           this a maximum of 5 times"""
+        for i in range(5):
+           if self.is_blank(ind-1):
+               self.pop(ind-1)
+               ind -= 1
+           else:
+               break
+           
         
-                       
+    def one_blank_above(self, ind):
+        """This is similar to self.one_blank_below, but it is slightly more
+           complicated because deleting a line above shifts everything up."""
+        if not self.is_blank(ind-1):
+            self.insert(ind,'')
+            # the original ind line just shifted down, so we need to
+            # increment ind, but we should just exit because the non-blank
+            # line that was above is not two lines up from the original ind
+            return
+
+        self.delete_blanks_above_ind(ind-1)
+
+
+    def one_blank_above_and_below(self, ind):
+        self.one_blank_below(ind)
+        self.one_blank_above(ind)
+        
+        
     def get_list(self, indlist):
         list_out = [self[ind] for ind in indlist]
         return txt_list(list_out)
@@ -315,13 +379,13 @@ class delimited_txt_file(txt_file_with_list):
         return self.nested_list
     
         
-    def __init__(self, pathin=None, list_map=default_map, delim='\t'):
+    def __init__(self, pathin=None, list_map=default_map, delim='\t',num_cols=None):
         from delimited_file_utils import open_delimited_with_sniffer_and_check
         txt_file_with_list.__init__(self, pathin, list_map=list_map)
         self.delim = delim
         self.break_list()#<-- eventually, this could probably be eliminated
         #self.array = array(self.nested_list)
-        self.array = open_delimited_with_sniffer_and_check(pathin)#<-- new stuff
+        self.array = open_delimited_with_sniffer_and_check(pathin,num_cols=num_cols)#<-- new stuff
         
 
     def save(self, pathout, array=None, delim=None):

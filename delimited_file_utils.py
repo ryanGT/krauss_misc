@@ -122,19 +122,30 @@ def check_delimited_for_uniformity(nestedlist):
         return True
     else:
         print('mode = %s' % mode)
+        print('items per row: %s' % items_per_row)
         print('---------------------')
         for i, row in enumerate(nestedlist):
             if len(row) != mode:
                 print('bad row: i = %i, len = %i, %s' % (i, len(row), row))
     
     
-def open_delimited_with_sniffer_and_check(pathin):
+def open_delimited_with_sniffer_and_check(pathin, num_cols=None):
     list1 = open_delimited_with_sniffer(pathin)
     list2 = filter_empty_lines(list1)
     list3 = filter_if_first_item_empy(list2)
-    test = check_delimited_for_uniformity(list3)
+    if num_cols is not None:
+        outlist = []
+        for row in list3:
+            if len(row) > num_cols:
+                outlist.append(row[0:num_cols])
+            elif len(row) == num_cols:
+                outlist.append(row)
+        list4 = outlist
+    else:
+        list4 = list3
+    test = check_delimited_for_uniformity(list4)
     assert test, "opening %s failed the uniformity check" % pathin
-    return array(list3)
+    return array(list4)
 
 
 #def write_removing_numeric_quotes(data, labels, filepath):
