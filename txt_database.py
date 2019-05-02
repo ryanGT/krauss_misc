@@ -470,11 +470,14 @@ def replace_commas_in_numbers(vect):
     clean_list = [item.replace(',','') for item in mylist]
     return array(clean_list)
 
+p_average = re.compile("[Aa]verage.*")
 p_pts = re.compile("Total_Pts_([0-9]+)_")
 p_quiz = re.compile("^Quiz_([0-9]+)_")
+p_quiz2 = re.compile("Quiz")
 p_exam = re.compile("^Exam_([0-9]+)_")
 p_group = re.compile("^Group")
-p_project = re.compile("[Pp]roject_.*")
+#p_project = re.compile("[Pp]roject_.*")
+p_project = re.compile("PA_([0-9]+).*")
 p_weighted_total = re.compile("^Weighted_Total_")
 p_total = re.compile("^Total_")
 p_survey = re.compile("[Ss]urvey_.*")
@@ -482,7 +485,8 @@ p_assign = re.compile("[Aa]ssign[ment]*_([0-9]+)_.*")
 p_la = re.compile("[Ll]earning_[Aa]ctivity_([0-9]+)_.*")
 p_extra_credit = re.compile("[Ee]xtra.*[Cc]redit")
 
-col_pat_dict = {"quiz":p_quiz, \
+col_pat_dict = {"average":p_average,\
+                "quiz":p_quiz2, \
                 "group_assign":p_group, \
                 "project":p_project, \
                 "weighted_total":p_weighted_total, \
@@ -494,10 +498,13 @@ col_pat_dict = {"quiz":p_quiz, \
                 "exam":p_exam, \
                 }
 
-pat_order_107 = ["total","weighted_total",\
+pat_order_107 = ["average", \
+                 "total", \
+                 "weighted_total",\
                  "survey", \
                  "group_assign", \
-                 "quiz","project",\
+                 "quiz", \
+                 "project",\
                  "learning_activity",\
                  "assignment", \
                  "extra_credit"]
@@ -540,10 +547,30 @@ class bb_column(object):
             if q:
                 self.list[i] = q.group(1)
                 self.vector[i] = q.group(1)
+
+
+
+    def clean_in_progress(self):
+        """Sometimes items are listed as In Progress(####), i.e. they
+        seem to have a suggested grade or one attempt has been graded
+        or something.  This seems to come from having one attempt
+        graded and others ignored when students upload multiple times.
+        So, I need to replace Needs Grading(##) with the score in the
+        paranthesis."""
+    
+        pat = re.compile("In Progress *\\(([0-9.]+)\\)")
+
+        for i, item in enumerate(self.list):
+            q = pat.search(item)
+            if q:
+                self.list[i] = q.group(1)
+                self.vector[i] = q.group(1)
+
                 
     def clean_grades(self):
         self.list = self.vector.tolist()
         self.clean_needs_grading()
+        self.clean_in_progress()
         self.emptygrades = self.list.count('')
         self.needs_grading = self.list.count('Needs Grading')
         cleanvecta = empty_strings_to_0(self.vector)
@@ -624,8 +651,8 @@ class bb_column(object):
         self.check_graded(N_tol=N_tol)
         self.pat_order = pat_order
         self.classify()
-        if self.classification != "extra_credit":
-            assert self.check_max(), "Max > possible: %s" % self.attr_name
+        ## if self.classification != "extra_credit":
+        ##     assert self.check_max(), "Max > possible: %s" % self.attr_name
 
 
 
@@ -731,7 +758,7 @@ class bb_grade_checker(txt_database_from_file):
         return matches
 
 
-    def find_quiz_average(self):
+    def find_quiz_average_equal_weight(self):
         self.get_graded_cols_one_classification("quiz")
         N_quizzes = len(self.quiz)
 
@@ -744,6 +771,22 @@ class bb_grade_checker(txt_database_from_file):
 
         self.quiz_average = q_ave
         return q_ave
+
+
+
+    def find_quiz_average_weighted(self):
+        self.get_graded_cols_one_classification("quiz")
+        quiz_total = 0
+        quiz_poss_total = 0
+
+        for col in self.quiz:
+            quiz_total += col.floatvect
+            quiz_poss_total += col.p_poss
+
+        self.quiz_total = quiz_total
+        self.quiz_average = (quiz_total/quiz_poss_total)*100
+        self.quiz_poss_total = quiz_poss_total
+        return self.quiz_average
 
 
     def find_hw_average(self):
