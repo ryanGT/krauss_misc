@@ -19,7 +19,11 @@ def relpath(target, base=os.curdir, checkpaths=False):
             raise OSError('Base is not a directory or does not exist: '+base)
     if target == base:
         return '.'
-    base_list = (os.path.abspath(base)).split(os.sep)
+    absbase = os.path.abspath(base)
+    # this should be generalized later
+    if absbase.find("Google Drive/Teaching/345_F19") > -1:
+        absbase = absbase.replace("Google Drive/Teaching/345_F19","345_F19")
+    base_list = (absbase.split(os.sep))
     test=base_list.pop()
     if test != '':
         base_list.append(test)

@@ -62,6 +62,16 @@ def save_and_crop_png(path_in, fi=None, dpi=450, pad_and_resize=True, \
         os.remove(path_in)
 
 
+def save_pdf_and_png(fno, folder='figs'):
+    if not os.path.exists(folder):
+        os.mkdir(folder)
+    path_no_e = os.path.join(folder,fno)
+    png_path = path_no_e + '.png'
+    pdf_path = path_no_e + '.pdf'
+    save_and_crop_png(png_path)
+    mysave(pdf_path)
+    
+
 def plot_cols(t, mat, fi=1, clear=True, leg=None, ylabel=None, \
               xlabel='Time (sec)', legloc=1, ylim=[], xlim=[], \
               figsize=None, \

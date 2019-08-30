@@ -106,6 +106,17 @@ class txt_database(object):
         return bool_vect
 
 
+    def find_attr_re(self, repat):
+        attr = None
+    
+        for item in self.attr_names:
+            q = repat.search(item)
+            if q is not None:
+                attr = q.group()
+                break
+        return attr
+    
+
     def find_col_from_list(self, label_list, case_sensitive=False):
         """search through self.col_attr_dict to find a key in
         label_list.  When a key is found that is in label_list, return
@@ -674,7 +685,37 @@ def get_short_col_name(colname):
             outname = outname[:ind]
 
     return outname
-    
+
+
+lpat = re.compile('[Ll]ast.*[Nn]ame')
+fpat = re.compile('[Ff]irst.*[Nn]ame')
+
+class class_list(txt_database_from_file):
+    def __init__(self, *args, **kwargs):
+        txt_database_from_file.__init__(self, *args, **kwargs)
+        self.find_first_and_last_name()
+        self.build_full_name()
+        
+
+    def find_first_and_last_name(self):
+        lattr = self.find_attr_re(lpat)
+        last_names = getattr(self, lattr)
+        if lattr != 'last_names':
+            self.last_names = last_names
+        fattr = self.find_attr_re(fpat)
+        first_names = getattr(self, fattr)
+        if fattr != 'first_names':
+            self.first_names = first_names
+        
+
+    def build_full_name(self):
+        if not hasattr(self, 'fullnames'):
+            fullnames = []
+            for first, last in zip(self.first_names, self.last_names):
+                cur_full = "%s, %s" % (last, first)
+                fullnames.append(cur_full)
+            self.fullnames = fullnames
+            
 
 class bb_grade_checker(txt_database_from_file):
     def __init__(self, *args, **kwargs):
