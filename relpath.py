@@ -21,8 +21,9 @@ def relpath(target, base=os.curdir, checkpaths=False):
         return '.'
     absbase = os.path.abspath(base)
     # this should be generalized later
-    if absbase.find("Google Drive/Teaching/345_F19") > -1:
-        absbase = absbase.replace("Google Drive/Teaching/345_F19","345_F19")
+    # - I am not sure what problem this fixed, but it is causing issues now
+    ## if absbase.find("Google Drive/Teaching/345_F19") > -1:
+    ##     absbase = absbase.replace("Google Drive/Teaching/345_F19","345_F19")
     base_list = (absbase.split(os.sep))
     test=base_list.pop()
     if test != '':

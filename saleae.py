@@ -80,7 +80,10 @@ class column(object):
 
 
     def find_high_periods(self):
-        self.high_periods = self.falling_edges - self.rising_edges
+        try:
+            self.high_periods = self.falling_edges - self.rising_edges
+        except:
+            pass
 
 
     def find_rising_edge_periods(self):

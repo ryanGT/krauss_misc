@@ -404,9 +404,9 @@ class delimited_txt_file(txt_file_with_list):
         dump(pathout, outlist)
 
              
-def dump(filename, listin):
+def dump(filename, listin, append=False):
     myfile = txt_file()
-    myfile.writefile(filename, listin)
+    myfile.writefile(filename, listin, append=append)
 
 
 def _row_to_spreadsheet_string(row, fmt='%s', delim='\t'):
