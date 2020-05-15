@@ -5,6 +5,17 @@ import shutil
 
 date_pat = re.compile('(\d\d)_(\d\d)_(\d\d)/*$')
 
+
+def slides_md_name_to_main_tex_name(md_in):
+    fno, ext = os.path.splitext(md_in)
+    base_name = fno.replace('_out','')
+    base_name = base_name.replace('_for_slides','_slides_main')
+    if '_main' not in base_name:
+        base_name += '_main'
+    tex_outpath = base_name + '.tex'
+    return tex_outpath
+
+
 def longest_match(file1, file2):
     """Find the longest string that matches the start of file1 and
     file2.  Used for renaming blackboard download files"""

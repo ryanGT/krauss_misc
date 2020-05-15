@@ -5,7 +5,7 @@ import copy
 import re
 import txt_mixin, delimited_file_utils
 
-from IPython.core.debugger import Pdb
+#from IPython.core.debugger import Pdb
 
 def get_non_blanks(arrayin):
     inds = where(arrayin != '')
