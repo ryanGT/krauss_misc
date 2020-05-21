@@ -508,7 +508,7 @@ def copy_making_dirs(source_path, dest_path):
     source_folder, source_file = os.path.split(source_path)
     dest_folder, dest_file = os.path.split(dest_path)
     assert source_file == dest_file, 'source_path and dest_file should both be full paths that end in the same file name:\n'+'source='+source_path+'\ndest='+dest_path
-    mylist = dest_folder.split('/')
+    mylist = dest_folder.split(os.path.sep)
     curroot = '/'
     while not mylist[0]:
         mylist.pop(0)

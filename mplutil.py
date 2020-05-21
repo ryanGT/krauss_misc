@@ -341,7 +341,7 @@ def set_custom_dashes(axes, line_id=0, \
 ##     _SetYLim(fig, phaselim, rowNum)
 
 
-def mysave(path_in, fig, ext='.eps', dpi=100):
+def mysave(path_in, fig, ext='.eps', dpi=100, kwargs={}):
     if isinstance(fig, matplotlib.axes.Axes):
         fig = fig.figure#you really sent me an axis
     if ext[0] != '.':
@@ -349,7 +349,7 @@ def mysave(path_in, fig, ext='.eps', dpi=100):
     path_no_ext, ext_in = os.path.splitext(path_in)
     if ext_in:
         ext = ext_in
-    kwargs = {}
+    #kwargs = {}
     if ext == '.pdf':
         ext = '.eps'
     elif ext == '.png':
