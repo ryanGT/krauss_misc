@@ -5,6 +5,17 @@ import shutil
 
 date_pat = re.compile('(\d\d)_(\d\d)_(\d\d)/*$')
 
+chrome_roots = {'445':'/mnt/chromeos/GoogleDrive/MyDrive/Teaching/445_SS20', \
+                'general_teaching':'/mnt/chromeos/GoogleDrive/MyDrive/Teaching/general_teaching/'
+                }
+
+mac_roots = {'445':'/Users/kraussry/445_SS20'}
+
+def get_root(key):
+    if os.path.exists('/mnt/chromeos/'):
+        return chrome_roots[key]
+    else:
+        return mac_roots[key]
 
 def slides_md_name_to_main_tex_name(md_in):
     fno, ext = os.path.splitext(md_in)
