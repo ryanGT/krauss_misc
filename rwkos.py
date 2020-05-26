@@ -536,7 +536,7 @@ def copy_making_dirs(source_path, dest_path):
         #print('curroot='+curroot)
         if not os.path.exists(curroot):
             os.mkdir(curroot)
-    shutil.copy2(source_path, dest_path)
+    shutil.copyfile(source_path, dest_path)
 
 def make_dir(pathin):
     """Check to see if pathin exists first, then make it if it
