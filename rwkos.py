@@ -17,6 +17,14 @@ def get_root(key):
     else:
         return mac_roots[key]
 
+
+def amichrome():
+    if os.path.exists('/mnt/chromeos/'):
+        return True
+    else:
+        return False
+    
+
 def slides_md_name_to_main_tex_name(md_in):
     fno, ext = os.path.splitext(md_in)
     base_name = fno.replace('_out','')

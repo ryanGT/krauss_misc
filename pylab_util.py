@@ -44,9 +44,11 @@ def mysave(path_in, fi=None, ext='.eps', dpi=100, pdfcrop=1, kwargs={}):
             print(cmd)
             os.system(cmd)
 
+
 def save_and_crop_png(path_in, fi=None, dpi=450, pad_and_resize=True, \
                       clean=True, width=1600, height=1000, kwargs={'bbox_inches':'tight'}):
     myfig = _get_fig(fi)
+
     mplutil.mysave(path_in, myfig, ext='.png', dpi=dpi, kwargs=kwargs)
     cmd = 'mytrim.py %s' % path_in
     os.system(cmd)
