@@ -5,7 +5,8 @@ import shutil
 
 date_pat = re.compile('(\d\d)_(\d\d)_(\d\d)/*$')
 
-chrome_roots = {'445':'/mnt/chromeos/GoogleDrive/MyDrive/Teaching/445_SS20', \
+chrome_roots = {'345':'/mnt/chromeos/GoogleDrive/MyDrive/Teaching/345_F20', \
+                '445':'/mnt/chromeos/GoogleDrive/MyDrive/Teaching/445_SS20', \
                 'general_teaching':'/mnt/chromeos/GoogleDrive/MyDrive/Teaching/general_teaching/'
                 }
 
