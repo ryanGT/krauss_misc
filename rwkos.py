@@ -9,7 +9,8 @@ chrome_roots = {'445':'/mnt/chromeos/GoogleDrive/MyDrive/Teaching/445_SS20', \
                 'general_teaching':'/mnt/chromeos/GoogleDrive/MyDrive/Teaching/general_teaching/'
                 }
 
-mac_roots = {'445':'/Users/kraussry/445_SS20'}
+mac_roots = {'445':'/Users/kraussry/445_SS20', \
+             'general_teaching':'/Users/kraussry/general_teaching'}
 
 def get_root(key):
     if os.path.exists('/mnt/chromeos/'):
