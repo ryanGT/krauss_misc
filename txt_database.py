@@ -494,6 +494,7 @@ p_total = re.compile("^Total_")
 p_survey = re.compile("[Ss]urvey_.*")
 p_assign = re.compile("[LA]+(ssignment)*_*([0-9]+)_.*")
 p_la = re.compile("[Ll]earning_[Aa]ctivity_([0-9]+)_.*")
+p_la2 = re.compile("LA_.*")
 p_extra_credit = re.compile("[Ee]xtra.*[Cc]redit")
 
 col_pat_dict = {"average":p_average,\
@@ -685,7 +686,36 @@ class bb_column(object):
         return out_str
 
 
+p_la2 = re.compile("LA_.*")
 
+col_pat_dict_345 = {"learning_activity":p_la2}
+
+pat_order_345 = ["learning_activity"]
+
+
+class bb_column_345(bb_column):
+    def classify(self):
+        self.classification = None
+
+        exam = False
+        if ("Midterm" in self.attr_name) or ("Exam" in self.attr_name):
+            exam = True
+            print("testing: %s" % self.attr_name)
+            q_test = p_exam.search(self.attr_name)
+            print("q_test = %s" % q_test)
+
+        for key in pat_order_345:
+            pattern = col_pat_dict_345[key]
+            q = pattern.search(self.attr_name)
+
+            if q is not None:
+                self.classification = key
+                break
+
+        if exam:
+            print("classification = %s" % self.classification)
+
+    
 def get_short_col_name(colname):
     """Start with chopping off at _Total_Pts and then keep chopping"""
     chop_list = ["_Total_Pts", "_from_", "_From_", "_due","_Due"]
@@ -749,7 +779,7 @@ class bb_grade_checker(txt_database_from_file):
             skipcols = None
         self._set_skip_cols(extraskipcols=skipcols)
         self.final=final
-
+        self.column_class = bb_column
 
         
     def _set_skip_cols(self, extraskipcols=None):
@@ -772,7 +802,7 @@ class bb_grade_checker(txt_database_from_file):
         column.  Care must be taken to handle empty grades and 'Needs
         Grading'"""
         myvect = getattr(self,attr)
-        column = bb_column(attr, myvect, pat_order=self.pat_order)
+        column = self.column_class(attr, myvect, pat_order=self.pat_order)
         
         ## if verbosity > 0:
         ##     print('='*20)
@@ -798,8 +828,8 @@ class bb_grade_checker(txt_database_from_file):
                 if verbosity > 0:
                     print('attr: %s' % attr)
                 myvect = getattr(self,attr)
-                column = bb_column(attr, myvect, N_tol=N_tol, \
-                                   pat_order=self.pat_order)
+                column = self.column_class(attr, myvect, N_tol=N_tol, \
+                                           pat_order=self.pat_order)
                 cols.append(column)
 
         self.columns = cols
@@ -971,7 +1001,7 @@ class bb_grade_checker(txt_database_from_file):
         for attr in self.attr_names:
             if (attr not in self.skipcols) and (attr.find(pat) == 0):
                 myvect = getattr(self, attr)
-                col = bb_column(attr, myvect, pat_order=self.pat_order)
+                col = self.column_class(attr, myvect, pat_order=self.pat_order)
                 setattr(self, attr_set, col)
 
 
@@ -1144,8 +1174,8 @@ class bb_grade_checker(txt_database_from_file):
         for attr in self.attr_names:
             if (attr.find("Midterm_Grade") == 0) or (attr.find("Exam_1")==0):
                 myvect = getattr(self, attr)
-                self.midterm_exam = bb_column(attr, myvect, \
-                                              pat_order=self.pat_order)
+                self.midterm_exam = self.column_class(attr, myvect, \
+                                                      pat_order=self.pat_order)
                 found = True
                 print('found')
                 break
@@ -1482,7 +1512,7 @@ class bb_107_final_grade_calculator_W20(bb_107_final_grade_calculator):
 
     def _get_str_vect_for_attr_col(self, attr):
         col = getattr(self, attr)
-        if isinstance(col, bb_column):
+        if isinstance(col, self.column_class):
             mylist = col.floatvect.astype(str).tolist()
         else:
             mylist = col.astype(str).tolist()
@@ -1547,7 +1577,7 @@ class bb_445_final_grade_helper(bb_107_final_grade_calculator):
         for attr in self.attr_names:
             if attr.find(pat) == 0:
                 myvect = getattr(self, attr)
-                col = bb_column(attr, myvect, pat_order=self.pat_order)
+                col = self.column_class(attr, myvect, pat_order=self.pat_order)
                 setattr(self, attr_set, col)
 
 
@@ -1560,7 +1590,7 @@ class bb_445_final_grade_helper(bb_107_final_grade_calculator):
     ##     for attr in self.attr_names:
     ##         if attr.find("Midterm_Exam") == 0:
     ##             myvect = getattr(self, attr)
-    ##             self.midterm_exam = bb_column(attr, myvect)
+    ##             self.midterm_exam = self.column_class(attr, myvect)
 
 
     def find_midterm(self):
@@ -1739,7 +1769,7 @@ class bb_445_final_grade_helper(bb_107_final_grade_calculator):
         for attr in self.attr_names:
             if attr.find("Midterm_Exam") == 0:
                 myvect = getattr(self, attr)
-                self.midterm_exam = bb_column(attr, myvect, \
+                self.midterm_exam = self.column_class(attr, myvect, \
                                               pat_order=self.pat_order)
 
 
@@ -1908,7 +1938,7 @@ class bb_445_final_grade_helper(bb_107_final_grade_calculator):
         for attr in self.attr_names:
             if attr.find("Midterm_Exam") == 0:
                 myvect = getattr(self, attr)
-                self.midterm_exam = bb_column(attr, myvect, \
+                self.midterm_exam = self.column_class(attr, myvect, \
                                               pat_order=self.pat_order)
 
 
@@ -1979,3 +2009,9 @@ class bb_445_final_grade_helper(bb_107_final_grade_calculator):
         return all_attrs
 
 
+class bb_345_final_grade_helper(bb_107_final_grade_calculator):
+    def __init__(self, *args, **kwargs):
+        if 'pat_order' not in kwargs:
+            kwargs['pat_order'] = pat_order_345
+        bb_107_final_grade_calculator.__init__(self, *args, **kwargs)
+        self.column_class = bb_column_345
