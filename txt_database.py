@@ -4,6 +4,7 @@ import numpy
 import copy
 import re
 import txt_mixin, delimited_file_utils
+import numpy as np
 
 #from IPython.core.debugger import Pdb
 
@@ -665,6 +666,20 @@ class bb_column(object):
             print("classification = %s" % self.classification)
 
 
+    def grade_pass_fail_submitted(self, grade):
+        """If an item was submitted, it is assumed to have the grade
+        listed as 'Needs Grading'.  If it is missing, it is assumed to
+        be empty.  All grades listed as 'Needs Grading' will be
+        replaced with grade.  Empty grades will be set to zero."""
+        grade_str = str(grade)
+        for i, item in enumerate(self.list):
+            if item == "Needs Grading":
+                self.list[i] = grade#_str
+            elif item == '':
+                self.list[i] = 0
+        self.vector = np.array(self.list)
+                
+
         
     def __init__(self, attr_name, vect_in, N_tol=3, pat_order=pat_order_107):
         # N_tol refers to number of ungraded or empty grades in
@@ -835,6 +850,37 @@ class bb_grade_checker(txt_database_from_file):
         self.columns = cols
                 
 
+    def dump_col_to_csv(self, col_list, filepath):
+        labels = self.labels[0:4]#should be ['Last Name', 'First Name', 'Username', 'Student ID']
+        data = self.data[:,0:4]
+
+        new_labels = []
+        new_data = []
+
+        for col in col_list:
+            col_label = self.label_attr_dict[col.attr_name]
+            col_list = col.list
+            new_labels.append(col_label)
+            new_data.append(col_list)
+
+        nda = np.column_stack(new_data)
+        data = np.column_stack([data, nda])
+        label_list = labels.tolist()
+        label_list += new_labels
+        txt_mixin.dump_delimited(filepath, data, labels=label_list, delim=',')
+        return data, label_list
+        #return new_data, new_labels, data, labels
+
+    def get_all_cols_one_classification(self, classification):
+        matches = []
+
+        for col in self.columns:
+            if col.classification == classification:
+                matches.append(col)
+
+        setattr(self, classification, matches)
+        return matches
+
 
     def get_graded_cols_one_classification(self, classification):
         matches = []
@@ -842,7 +888,7 @@ class bb_grade_checker(txt_database_from_file):
         for col in self.columns:
             if col.classification == classification:
                 if self.final or col.graded:#assume all columns are
-                                            #graded in a final grade check
+                    #graded in a final grade check
                     matches.append(col)
 
         setattr(self, classification, matches)
