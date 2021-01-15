@@ -200,6 +200,15 @@ def clean_filename(pathin, split=True):
     return os.path.join(folder, out+ext)
 
 
+def clean_files_in_folder(pathin):
+    """Find all filesin pathin using glob("*.*") and clean them all
+    using clean_filename and shutil.move"""
+    myfiles = glob.glob(os.path.join(pathin,"*.*"))
+    for curfile in myfiles:
+        clean_name = clean_filename(curfile)
+        shutil.move(curfile, clean_name)
+                        
+
 def splittolist(pathstr):
     listout = pathstr.split(os.sep)
     while not listout[-1]:
