@@ -7,7 +7,8 @@ date_pat = re.compile('(\d\d)_(\d\d)_(\d\d)/*$')
 
 chrome_roots = {'345':'/mnt/chromeos/GoogleDrive/MyDrive/Teaching/345_F20', \
                 '445':'/mnt/chromeos/GoogleDrive/MyDrive/Teaching/445_SS20', \
-                'general_teaching':'/mnt/chromeos/GoogleDrive/MyDrive/Teaching/general_teaching/'
+                'general_teaching':'/mnt/chromeos/GoogleDrive/MyDrive/Teaching/general_teaching', \
+                '185':'/mnt/chromeos/GoogleDrive/MyDrive/185_template', \
                 }
 
 mac_roots = {'345':'/Users/kraussry/345_F20', \
@@ -550,6 +551,7 @@ def copy_making_dirs(source_path, dest_path):
         if not os.path.exists(curroot):
             os.mkdir(curroot)
     shutil.copyfile(source_path, dest_path)
+    #shutil.copy(source_path, dest_path)#<-- is this crostini friendly?
 
 def make_dir(pathin):
     """Check to see if pathin exists first, then make it if it
