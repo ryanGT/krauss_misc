@@ -14,6 +14,7 @@ chrome_roots = {'345':'/mnt/chromeos/GoogleDrive/MyDrive/Teaching/345_F20', \
 mac_roots = {'345':'/Users/kraussry/345_F20', \
              '445':'/Users/kraussry/445_SS20', \
              '185':'/Users/kraussry/185_template', \
+             '185_bad': '/Users/kraussry/Google Drive/185_template', \
              'general_teaching':'/Users/kraussry/general_teaching'}
 
 def get_root(key):
