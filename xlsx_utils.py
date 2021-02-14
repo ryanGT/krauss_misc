@@ -1,4 +1,4 @@
-import openpyxl, datetime
+import openpyxl, datetime, os, txt_mixin
 
 def search_one_label(cellin, match):
     value = cellin.value
@@ -55,10 +55,10 @@ def convert_row_to_string(rowin):
 def clean_string(str_in):
     """clean up strings that I find hard to deal with in spreadsheet
     cells (mainly newlines)."""
-    if type(str_in) in [int, float]:
+    if type(str_in) in [int, float, bool]:
         return str_in
     else:
-        print('type(str_in) = %s' % type(str_in))
+        #print('type(str_in) = %s' % type(str_in))
         #str_in = str(str_in)
         if type(str_in) == bytes:
             str_in = str_in.decode("utf-8")
@@ -103,16 +103,16 @@ def get_all_data(sheet_in, debug=0):
     after the label rows."""
     ## label_row, label_ind = find_label_row(sheet_in)
     ## encoded_labels = convert_row_to_string(label_row)
-    N = len(sheet_in.rows)
+    #N = len(sheet_in.rows)
     ## start_row = label_ind + 1
     start_row = 0
     
     data_out = []
     
-    for i in range(start_row, N):
-        cur_row = sheet_in.rows[i]
-        if debug > 0:
-            print('i = %i' % i)
+    for cur_row in sheet_in.rows:
+        #cur_row = sheet_in.rows[i]
+        #if debug > 0:
+        #    print('i = %i' % i)
         if empty_row_check(cur_row):
             break
         
@@ -133,13 +133,21 @@ def get_all_data(sheet_in, debug=0):
 def get_all_data_by_filename(filename, sheet_ind=0, verbosity=1, \
                              data_only=False):
     wb = openpyxl.load_workbook(filename, data_only=data_only)
-    sheet_names = wb.get_sheet_names()
+    sheet_names = wb.sheetnames
 
     if len(sheet_names) > 1 and verbosity > 0:
         print("Warning: more than one sheet")
 
-    sheet1 = wb.get_sheet_by_name(sheet_names[sheet_ind])
+    sheet1 = wb[sheet_names[0]]
 
     data_out = get_all_data(sheet_in=sheet1)
 
     return data_out
+
+
+def xlsx_to_csv(xlsx_name):
+    pne, ext = os.path.splitext(xlsx_name)
+    csv_path = pne + '.csv'
+    data = get_all_data_by_filename(xlsx_name)
+    txt_mixin.dump_delimited(csv_path, data, delim='\t')
+    return csv_path
