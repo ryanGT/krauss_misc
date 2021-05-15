@@ -86,7 +86,7 @@ def readfile(pathin, strip=False, rstrip=True, verbosity=0):
             print('found file:'+goodpath)
         f=open(goodpath,'r')
     else:
-        raise StandardError("Could not find "+pathin+" in sys.path")
+        raise OSError("Could not find "+pathin+" in sys.path")
     listin=f.readlines()
     f.close()
     if strip:

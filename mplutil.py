@@ -352,7 +352,7 @@ def mysave(path_in, fig, ext='.eps', dpi=100, kwargs={}):
     #kwargs = {}
     if ext == '.pdf':
         ext = '.eps'
-    elif ext == '.png':
+    elif ext in ['.png','.jpg']:
         kwargs['dpi'] = dpi
     path_out = path_no_ext + ext
     fig.savefig(path_out, **kwargs)

@@ -64,6 +64,25 @@ def save_and_crop_png(path_in, fi=None, dpi=450, pad_and_resize=True, \
     if clean:
         os.remove(path_in)
 
+def save_and_trim_jpg(path_in, fi=None, dpi=450, pad_and_resize=True, \
+                      clean=True, width=1600, height=1000, kwargs={'bbox_inches':'tight'}):
+    myfig = _get_fig(fi)
+
+    mplutil.mysave(path_in, myfig, ext='.jpg', dpi=dpi, kwargs=kwargs)
+    cmd = 'mytrim.py %s' % path_in
+    os.system(cmd)
+    if pad_and_resize:
+        fno, ext = os.path.splitext(path_in)
+        fn2 = fno +'_trimmed.jpg'
+        cmd2 = 'resize_and_pad_image_for_jupyter_slides.py %s -w %i --height %i' % \
+               (fn2, width, height)
+        os.system(cmd2)
+        if clean:
+            if os.path.exists(fn2):
+                os.remove(fn2)
+    if clean:
+        os.remove(path_in)
+
 
 def save_pdf_and_png(fno, folder='figs'):
     if not os.path.exists(folder):
