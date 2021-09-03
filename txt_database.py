@@ -493,10 +493,12 @@ p_project = re.compile("P(A|a)_*([0-9]+).*")
 p_weighted_total = re.compile("^Weighted_Total_")
 p_total = re.compile("^Total_")
 p_survey = re.compile("[Ss]urvey_.*")
-p_assign = re.compile("[LA]+(ssignment)*_*([0-9]+)_.*")
+p_assign = re.compile("[aA]+(ssignment)*_*([0-9]+)_.*")
+p_assign_445 = re.compile("^Assignment_[0-9]+_.*")
 p_la = re.compile("[Ll]earning_[Aa]ctivity_([0-9]+)_.*")
 p_la2 = re.compile("LA_.*")
 p_extra_credit = re.compile("[Ee]xtra.*[Cc]redit")
+
 
 col_pat_dict = {"average":p_average,\
                 "quiz":p_quiz2, \
@@ -730,6 +732,83 @@ class bb_column_345(bb_column):
         if exam:
             print("classification = %s" % self.classification)
 
+
+# how to pass the col_pat_dict in is tricky
+p_wsq = re.compile("^WSQ_.*")
+p_bb_quiz = re.compile("^BB.*")
+p_pnp_quiz = re.compile("^PNP_Quiz")
+p_midterm_445 = re.compile("Midterm_Total.*")
+p_final_445 = re.compile("Final_Exam.*")
+p_project_445 = re.compile("^Project.*")
+
+
+col_pat_dict_445 = {"pnp_quiz":p_pnp_quiz, \
+                    "bb_quiz":p_bb_quiz, \
+                    "project":p_project_445, \
+                    "midterm":p_midterm_445, \
+                    "final_exam":p_final_445, \
+                    "weighted_total":p_weighted_total, \
+                    "total":p_total, \
+                    "assignment":p_assign_445, \
+                    "learning_activity":p_la2, \
+                    "survey":p_survey, \
+                    "extra_credit":p_extra_credit, \
+                    "WSQ":p_wsq, \
+                    "exam":p_exam, \
+                    }
+
+pat_order_445_SS21 = ["WSQ", \
+                      "learning_activity",\
+                      "pnp_quiz", \
+                      "bb_quiz", \
+                      "midterm", \
+                      "final_exam", \
+                      "project",\
+                      "total","weighted_total",\
+                      "survey", \
+                      "exam", \
+                      "assignment", \
+                      "extra_credit"]
+
+
+class bb_column_445(bb_column):
+    def __init__(self, attr_name, vect_in, N_tol=3, pat_order=pat_order_107, \
+                 col_pat_dict=col_pat_dict_445):
+        # N_tol refers to number of ungraded or empty grades in
+        # a column to consider it not yet graded
+        self.attr_name = attr_name
+        self.vector = copy.copy(vect_in)
+        self.clean_grades()                     
+        self.check_graded(N_tol=N_tol)
+        self.pat_order = pat_order
+        self.col_pat_dict = col_pat_dict
+        self.classify()
+        ## if self.classification != "extra_credit":
+        ##     assert self.check_max(), "Max > possible: %s" % self.attr_name
+
+
+    def classify(self):
+        self.classification = None
+
+        exam = False
+        if ("Midterm" in self.attr_name) or ("Exam" in self.attr_name):
+            exam = True
+            print("testing: %s" % self.attr_name)
+            q_test = p_exam.search(self.attr_name)
+            print("q_test = %s" % q_test)
+
+        for key in pat_order_445_SS21:
+            pattern = self.col_pat_dict[key]
+            q = pattern.search(self.attr_name)
+
+            if q is not None:
+                self.classification = key
+                break
+
+        if exam:
+            print("classification = %s" % self.classification)
+
+
     
 def get_short_col_name(colname):
     """Start with chopping off at _Total_Pts and then keep chopping"""
@@ -772,7 +851,18 @@ class class_list(txt_database_from_file):
                 cur_full = "%s, %s" % (last, first)
                 fullnames.append(cur_full)
             self.fullnames = fullnames
-            
+
+
+standard_grade_cutoffs = {'A':93, \
+                          'A-':90, \
+                          'B+':87, \
+                          'B':83, \
+                          'B-':80, \
+                          'C+':77, \
+                          'C':73, \
+                          'D+':65, \
+                          'D':60, \
+                          'F':0}
 
 class bb_grade_checker(txt_database_from_file):
     def __init__(self, *args, **kwargs):
@@ -787,6 +877,12 @@ class bb_grade_checker(txt_database_from_file):
         else:
             final = False
 
+        if 'grade_cutoffs' in kwargs:
+            cutoffs = kwargs.pop('grade_cutoffs')
+        else:
+            cutoffs = standard_grade_cutoffs
+        self.cutoffs = cutoffs
+        
         txt_database_from_file.__init__(self, *args, **kwargs)
         if 'skipcols' in kwargs:
             skipcols = kwargs['skipcols']
@@ -1084,6 +1180,34 @@ class bb_grade_checker(txt_database_from_file):
         return self.midpoint
 
     
+    def assign_letter_grades(self, attr):
+        """Assign letter grades based on the column referred to by attr and using
+        self.cutoffs"""
+        myvect = getattr(self, attr)
+        N = len(myvect)
+        letter_grades = zeros(N, dtype='S2')
+        gpa = zeros(N)
+        grade_list = ['A','A-','B+','B','B-','C+','C','D+','D','F']
+        gpa_dict = {'A':4.0,\
+                    'A-':3.666666667,\
+                    'B+':3.3333333333333, \
+                    'B':3.0,\
+                    'B-':2.666666666666666666666667,\
+                    'C+':2.33333333333333333333333,\
+                    'C':2.0, \
+                    'D+':1.6666666666666666666667,\
+                    'D':1.0,\
+                    'F':0}
+                    
+        for i, cur_grade in enumerate(myvect):
+            for letter_grade in grade_list:
+                if cur_grade >= self.cutoffs[letter_grade]:
+                    letter_grades[i] = str(letter_grade)
+                    gpa[i] = gpa_dict[letter_grade]
+                    break
+
+        self.letter_grades = letter_grades
+        self.gpa = gpa
         
 
 
@@ -1716,6 +1840,7 @@ class bb_445_final_grade_helper(bb_107_final_grade_calculator):
         self.hw_poss_total = hw_poss_total
         return self.hw_ave
 
+        
 
     def hw_report_data(self, short=False):
         data = []
@@ -2053,6 +2178,173 @@ class bb_445_final_grade_helper(bb_107_final_grade_calculator):
 
 
         return all_attrs
+
+
+def get_column_total(col_list):
+    col_total = 0 
+    for col in col_list:
+        col_total += col.floatvect
+    return col_total
+    
+
+def find_points_possible(col_list):
+    possible = 0
+    for col in col_list:
+        possible += col.p_poss
+    return possible
+
+
+grade_cutoffs_445_SS21 = {'A':92.5, \
+                          'A-':89.5, \
+                          'B+':86.5, \
+                          'B':82.5, \
+                          'B-':79.5, \
+                          'C+':76.5, \
+                          'C':72.5, \
+                          'D+':64.5, \
+                          'D':59.5, \
+                          'F':0}
+
+        
+class bb_445_final_grade_helper_SS21(bb_445_final_grade_helper):
+    def __init__(self, *args, **kwargs):
+        if 'pat_order' not in kwargs:
+            kwargs['pat_order'] = pat_order_445_SS21
+        self.col_pat_dict = col_pat_dict_445            
+        bb_107_final_grade_calculator.__init__(self, *args, **kwargs)
+        self.cutoffs = grade_cutoffs_445_SS21
+        self.column_class = bb_column_445
+
+
+    def classify(self):
+        self.classification = None
+
+        exam = False
+        if ("Midterm" in self.attr_name) or ("Exam" in self.attr_name):
+            exam = True
+            print("testing: %s" % self.attr_name)
+            q_test = p_exam.search(self.attr_name)
+            print("q_test = %s" % q_test)
+
+
+        for key in self.pat_order:
+            pattern = self.col_pat_dict[key]
+            q = pattern.search(self.attr_name)
+
+            if q is not None:
+                self.classification = key
+                break
+
+        if exam:
+            print("classification = %s" % self.classification)
+
+
+    def find_wsq_average(self):
+        self.wsq_cols = self.get_graded_cols_one_classification("WSQ")
+        self.wsq_possible = 10*len(self.wsq_cols)
+        self.wsq_total = get_column_total(self.wsq_cols)
+        self.wsq_ave = self.wsq_total/self.wsq_possible*100
+        return self.wsq_ave
+
+
+    def find_LA_average(self):
+        self.get_graded_cols_one_classification("learning_activity")
+        self.LA_possible = find_points_possible(self.learning_activity)
+        self.LA_total = get_column_total(self.learning_activity)
+        self.LA_ave = self.LA_total/self.LA_possible*100
+
+
+    def find_average(self, class_str):
+        col_list = self.get_graded_cols_one_classification(class_str)
+        possible = find_points_possible(col_list)
+        total_vect = get_column_total(col_list)
+        ave_vect = total_vect/possible*100
+        return ave_vect
+
+
+    def get_quiz_aves(self):
+        self.pnp_quiz_ave = self.find_average("pnp_quiz")
+        self.bb_quiz_ave = self.find_average("bb_quiz")
+
+
+    def get_assign_aves(self):
+        self.assign_ave = self.find_average("assignment")
+
+
+    def get_project_aves(self):
+        self.project_cols = self.get_graded_cols_one_classification("project")
+        self.project_possible = 100*len(self.project_cols)
+        self.project_total = get_column_total(self.project_cols)
+        self.project_ave = self.project_total/self.project_possible*100
+        return self.project_ave
+
+
+    def get_midterm(self):
+        self.midterm_list = self.get_graded_cols_one_classification("midterm")
+        self.midterm_float = self.midterm_list[0].floatvect
+
+
+    def get_final(self):
+        self.final_exam_list = self.get_graded_cols_one_classification("final_exam")
+        self.final_exam_float = self.final_exam_list[0].floatvect
+        
+        
+    def find_grades(self):
+        self.find_wsq_average()#5%
+        self.find_LA_average()#5%
+        self.get_assign_aves()#15%
+        # need PA stuff#30%
+        self.get_quiz_aves()#15%
+        self.get_midterm()#10%
+        self.get_final()#20%
+        self.get_project_aves()
+        
+
+    def calc_course_grade(self):
+        self.course_grade = self.wsq_ave*0.05 + \
+                            self.LA_ave*0.05 + \
+                            self.pnp_quiz_ave*0.075 + \
+                            self.bb_quiz_ave*0.075 + \
+                            self.assign_ave*0.15 + \
+                            self.midterm_float*0.1 + \
+                            self.final_exam_float*0.2 + \
+                            self.project_ave*0.3
+        #den = 0.7
+        #self.course_grade /= den
+        return self.course_grade
+
+
+    def dump_upload(self):
+        outname = "final_grades_upload_445_SS21.csv"
+        labels = self.labels[0:3].tolist()
+        data = self.data[:,0:3]
+        new_data = np.column_stack([self.wsq_ave, \
+                                    self.LA_ave, \
+                                    self.pnp_quiz_ave, \
+                                    self.bb_quiz_ave, \
+                                    self.assign_ave, \
+                                    self.midterm_float, \
+                                    self.final_exam_float, \
+                                    self.project_ave, \
+                                    self.course_grade, \
+                                    self.letter_grades, \
+                                    self.gpa])
+        new_labels = ['WSQ Ave.','LA Ave.','PNP Quiz Ave.','BB Quiz Ave.','HW Assignment Ave.', \
+                      'Midterm','Final Exam','Project Ave.','Course Grade','Course Letter Grade','GPA']
+        full_data = np.column_stack([data,new_data])
+        full_labels = labels + new_labels
+        txt_mixin.dump_delimited(outname, full_data, delim=',', fmt='%s', labels=full_labels)
+                                    
+
+## 445 SS 21 grading plan
+### - WSQ: 5%
+### - LAs: 5%
+### - assign. 1-5 = HW: 15%
+### - PA 3, 4, and 5: 30%
+### - PNP quizzes: 7.5%
+### - BB quizzes: 7.5%
+### - midterm 10%
+### - final exam: 20%
 
 
 class bb_345_final_grade_helper(bb_107_final_grade_calculator):
