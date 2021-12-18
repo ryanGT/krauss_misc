@@ -704,33 +704,42 @@ class bb_column(object):
 
 
 p_la2 = re.compile("LA_.*")
+lab_345 = re.compile("Lab_[0-9]+_.*")
+quiz_345 = re.compile(".*[Qq]uiz_.*")
+robo_pat = re.compile("Robolympics_Project_Grade_Total.*")
+hw_345 = re.compile("HW[0-9]+_.*")
+la_345 = re.compile(".*[Ll]earning_[Aa]ctivity_.*")
+midterm = re.compile("[Mm]idterm_.*")
+lp_345 = re.compile("Lab_Practical_Total.*")
 
-col_pat_dict_345 = {"learning_activity":p_la2}
+#col_pat_dict_345 = {"learning_activity":p_la2}
+#pat_order_345 = ["learning_activity"]
+pat_classification_pairs_345 = [("lab",lab_345), \
+                                ("lab",robo_pat), \
+                                ("quiz",quiz_345), \
+                                ("hw", hw_345), \
+                                ("hw", la_345), \
+                                ("exam", midterm), \
+                                ("exam", lp_345), \
+                                ]
 
-pat_order_345 = ["learning_activity"]
+unique_345_classifications = []
 
+for key, classification in pat_classification_pairs_345:
+    if key not in unique_345_classifications:
+        unique_345_classifications.append(key)
+        
 
 class bb_column_345(bb_column):
     def classify(self):
         self.classification = None
 
-        exam = False
-        if ("Midterm" in self.attr_name) or ("Exam" in self.attr_name):
-            exam = True
-            print("testing: %s" % self.attr_name)
-            q_test = p_exam.search(self.attr_name)
-            print("q_test = %s" % q_test)
-
-        for key in pat_order_345:
-            pattern = col_pat_dict_345[key]
+        for key, pattern in pat_classification_pairs_345:
             q = pattern.search(self.attr_name)
 
             if q is not None:
                 self.classification = key
                 break
-
-        if exam:
-            print("classification = %s" % self.classification)
 
 
 # how to pass the col_pat_dict in is tricky
@@ -904,6 +913,7 @@ class bb_grade_checker(txt_database_from_file):
         if extraskipcols is not None:
             skipcols += extraskipcols
         self.skipcols = skipcols
+        print("self.skipcols = %s" % self.skipcols)
         self.p_pts = re.compile("Total_Pts_([0-9]+)_")
         
 
@@ -934,7 +944,10 @@ class bb_grade_checker(txt_database_from_file):
 
     def create_cols(self, verbosity=1, N_tol=3):
         cols = []
+        #print("in create_cols, self.skipcols = %s" % self.skipcols)
         for attr in self.attr_names:
+            #mytest = attr == "Last_Name"
+            #print("mytest: %s" % mytest)
             if attr not in self.skipcols:
                 if verbosity > 0:
                     print('attr: %s' % attr)
@@ -977,6 +990,14 @@ class bb_grade_checker(txt_database_from_file):
         setattr(self, classification, matches)
         return matches
 
+
+    def get_unclassified_cols(self):
+        matches = []
+        for col in self.columns:
+            if col.classification is None:
+                matches.append(col)
+        return matches
+        
 
     def get_graded_cols_one_classification(self, classification):
         matches = []
@@ -2346,6 +2367,16 @@ class bb_445_final_grade_helper_SS21(bb_445_final_grade_helper):
 ### - midterm 10%
 ### - final exam: 20%
 
+
+## The Plan:
+## - classify the columns
+##     - find Lab grades
+##     - find quiz grades
+##     - find HW and LAs
+##     - find midterm
+##     - find lab practical
+## - process PSQ grades
+        
 
 class bb_345_final_grade_helper(bb_107_final_grade_calculator):
     def __init__(self, *args, **kwargs):
