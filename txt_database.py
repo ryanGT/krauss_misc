@@ -711,6 +711,8 @@ hw_345 = re.compile("HW[0-9]+_.*")
 la_345 = re.compile(".*[Ll]earning_[Aa]ctivity_.*")
 midterm = re.compile("[Mm]idterm_.*")
 lp_345 = re.compile("Lab_Practical_Total.*")
+final_exam_345 = re.compile("Final_Exam_Total_.*")
+psq_pat = re.compile("PSQ_Average_.*")
 
 #col_pat_dict_345 = {"learning_activity":p_la2}
 #pat_order_345 = ["learning_activity"]
@@ -719,8 +721,10 @@ pat_classification_pairs_345 = [("lab",lab_345), \
                                 ("quiz",quiz_345), \
                                 ("hw", hw_345), \
                                 ("hw", la_345), \
-                                ("exam", midterm), \
-                                ("exam", lp_345), \
+                                ("midterm", midterm), \
+                                ("lab_practical", lp_345), \
+                                ("final_exam", final_exam_345), \
+                                ("psq", psq_pat), \
                                 ]
 
 unique_345_classifications = []
@@ -2226,6 +2230,7 @@ grade_cutoffs_445_SS21 = {'A':92.5, \
                           'D':59.5, \
                           'F':0}
 
+
         
 class bb_445_final_grade_helper_SS21(bb_445_final_grade_helper):
     def __init__(self, *args, **kwargs):
@@ -2378,9 +2383,97 @@ class bb_445_final_grade_helper_SS21(bb_445_final_grade_helper):
 ## - process PSQ grades
         
 
+grade_cutoffs_345_F21 = {'A':87.5, \
+                         'A-':84.5, \
+                         'B+':79.0, \
+                         'B':75., \
+                         'B-':70., \
+                         'C+':66.5, \
+                         'C':61.5, \
+                         'D+':57.5, \
+                         'D':49.5, \
+                         'F':0}
+
+
 class bb_345_final_grade_helper(bb_107_final_grade_calculator):
     def __init__(self, *args, **kwargs):
-        if 'pat_order' not in kwargs:
-            kwargs['pat_order'] = pat_order_345
         bb_107_final_grade_calculator.__init__(self, *args, **kwargs)
         self.column_class = bb_column_345
+        self.cutoffs = grade_cutoffs_345_F21
+        
+
+    def find_average(self, class_str):
+        col_list = self.get_graded_cols_one_classification(class_str)
+        possible = find_points_possible(col_list)
+        total_vect = get_column_total(col_list)
+        ave_vect = total_vect/possible*100
+        return ave_vect
+    
+
+
+    def find_averages(self, class_list=['hw','lab','quiz']):
+        for class_str in class_list:
+            ave_vect = self.find_average(class_str)
+            attr = class_str + "_ave"
+            setattr(self, attr, ave_vect)
+
+
+    def collect_grades(self):
+        psq_col = self.get_all_cols_one_classification("psq")[0]
+        self.psq_ave = psq_col.floatvect*10
+        midterm_col = self.get_all_cols_one_classification("midterm")[0]
+        self.midterm_col = midterm_col.floatvect
+        final_exam_col = self.get_all_cols_one_classification("final_exam")[0]
+        self.final_exam_col = final_exam_col.floatvect
+        lab_practical_col = self.get_all_cols_one_classification("lab_practical")[0]
+        self.lab_practical_col  = lab_practical_col.floatvect
+
+
+    def calc_exam_average(self):
+        self.exam_average = (self.midterm_col + self.final_exam_col + self.lab_practical_col)/3
+        
+
+    def calc_course_grades(self):
+        self.course_grades = 0.1*self.psq_ave + \
+                             0.15*self.hw_ave + \
+                             0.2*self.lab_ave + \
+                             0.1*self.quiz_ave + \
+                             0.1*self.midterm_col + \
+                             0.1*self.lab_practical_col + \
+                             0.25*self.final_exam_col
+        return self.course_grades
+
+
+    def dump_upload(self):
+        outname = "final_grades_upload_345_F21.csv"
+        labels = self.labels[0:3].tolist()
+        data = self.data[:,0:3]
+        new_data = np.column_stack([self.quiz_ave, \
+                                    self.hw_ave, \
+                                    self.lab_ave, \
+                                    self.course_grades, \
+                                    self.exam_average, \
+                                    self.letter_grades, \
+                                    self.gpa])
+        new_labels = ['Quiz Average','HW and LA Average','Lab Average','Course Grade',\
+                      'Exam Average','Course Letter Grade','GPA']
+        full_data = np.column_stack([data,new_data])
+        full_labels = labels + new_labels
+        txt_mixin.dump_delimited(outname, full_data, delim=',', fmt='%s', labels=full_labels)
+    
+
+    def enforce_min_exam(self, min_score, rep_letter_grade="D+", rep_gpa=1.6666666666666666666667):
+        for i, exam_score in enumerate(self.exam_average):
+            if exam_score < min_score:
+                self.letter_grades[i] = rep_letter_grade
+                self.gpa[i] = rep_gpa
+                
+        
+    def main(self):
+        self.find_averages()
+        self.collect_grades()
+        self.calc_exam_average()
+        self.calc_course_grades()
+        self.assign_letter_grades("course_grades")
+        self.enforce_min_exam(60)
+        self.dump_upload()
