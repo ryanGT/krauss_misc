@@ -1,4 +1,6 @@
 import openpyxl, datetime, os, txt_mixin
+import pandas as pd
+
 
 def search_one_label(cellin, match):
     value = cellin.value
@@ -148,6 +150,8 @@ def get_all_data_by_filename(filename, sheet_ind=0, verbosity=1, \
 def xlsx_to_csv(xlsx_name):
     pne, ext = os.path.splitext(xlsx_name)
     csv_path = pne + '.csv'
-    data = get_all_data_by_filename(xlsx_name)
-    txt_mixin.dump_delimited(csv_path, data, delim='\t')
+    df = pd.DataFrame(pd.read_excel(xlsx_name))
+    df.to_csv(csv_path, index=False)
+    #data = get_all_data_by_filename(xlsx_name)
+    #txt_mixin.dump_delimited(csv_path, data, delim='\t')
     return csv_path

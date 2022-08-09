@@ -7,6 +7,20 @@ import txt_database
 import pylab_util as PU
 
 
+# Plan for teensy micropython:
+
+# - find times when squarewave changes
+#     - changing edges after t>0
+# - find falling edges for ??
+# - find corresponding falling edges for Arduino control pin
+# - find delta_t from timing signal change to Arduino control pin fall
+
+
+mybrown = "#65372D"
+myorange = "#F57C40"
+mypurple = "#C32AEC"
+colors = ['k',mybrown,'r',myorange,'y', 'g','b',mypurple]
+
 class vector_summary(object):
     def calc_stats(self):
         self.mean = self.vector.mean()
@@ -56,6 +70,7 @@ class column(object):
         self.find_high_periods()
         self.find_rising_edge_periods()
         self.find_falling_edge_periods()
+        self.find_change_edges()
         
 
     def find_rising_edges(self):
@@ -68,6 +83,23 @@ class column(object):
         inds = np.where(d1>d2)[0]
         self.rising_edges = t1[inds]
         self.rising_points = d1[inds]
+
+
+
+    def find_change_edges(self, filt_neg=True):
+        """A rising edge is any point where the current value is
+        greater than the previous value.  The time of the rising edge
+        is after the value has switched high.
+
+        If filt_neg, filter out any negative times in inds."""
+        d1 = self.data[1:]
+        t1 = self.t[1:]
+        d2 = self.data[0:-1]
+        inds = np.where(d1!=d2)[0]
+        if filt_neg:
+            inds = [ind for ind in inds if t1[ind]>=0]
+        self.change_edges = t1[inds]
+        self.change_points = d1[inds]        
 
 
     def find_falling_edges(self):
@@ -179,6 +211,39 @@ class saleae_csv(txt_database.txt_database_from_file):
             cols.append(cur_col)
 
         self.columns = cols
+
+
+    def plot(self, xlim=None, channels=[], cursor_x=None):
+        """Create a plot similar to what is displayed in the Logic GUI
+        oscope window for verification purposes.
+
+        Channels is a list of ints from 0-7 corresponding to the
+        saleae channels.  If channels is empty, plot all channels.
+        Otherwise get the ch_%i channels found in the list.
+
+        - find the corresponding colors
+        - plot each channel on its own subplot"""
+        if not channels:
+            channels = list(self.ch_nums)
+
+        t = self.t
+        N = len(channels)
+        self.fig = plt.figure(figsize=(6,8))
+        self.axes = []
+        for i in channels:
+            j = i+1
+            ax_j = self.fig.add_subplot(N,1,j)
+            attr_i = "ch_%i" % i
+            ch_i = getattr(self,attr_i)
+            color = colors[i]
+            ax_j.step(t, ch_i.data, color=color, where="post")
+            if xlim is not None:
+                ax_j.set_xlim(xlim)
+            if cursor_x is not None:
+                ax_j.plot([cursor_x, cursor_x],[0,1],'k--')
+            ax_j.set_ylabel("Ch %i" % i)
+            ax_j.set_xlabel("Time (sec.)")
+            self.axes.append(ax_j)
         
 
 def diff_vects(vect1, vect2, shift2=0):

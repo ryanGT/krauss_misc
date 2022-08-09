@@ -30,7 +30,14 @@ def amichrome():
         return True
     else:
         return False
-    
+
+
+def find_one_glob(glob_pat):
+    matches = glob.glob(glob_pat)
+    assert len(matches) > 0, "did not find a match for %s" % glob_pat
+    assert len(matches) == 1, "found more than one match for %s:\n %s" % (glob_pat, matches)
+    return matches[0]
+
 
 def slides_md_name_to_main_tex_name(md_in):
     fno, ext = os.path.splitext(md_in)
