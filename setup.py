@@ -4,15 +4,16 @@ import setuptools
 #    long_description = fh.read()
 
 setuptools.setup(
-    name='py_block_diagram',    # This is the name of your PyPI-package.
-    version='0.9.3',
-    url='https://github.com/ryanGT/py_block_diagram',
+    name='krauss_misc',    # This is the name of your PyPI-package.
+    version='0.9.0',
+    url='https://github.com/ryanGT/krauss_misc',
     author='Ryan Krauss',
     author_email='ryanwkrauss@gmail.com',
-    description="package for  the backend of modeling controls block diagrams in python",
+    description="package of misc code that supports other projects of mine",
     #long_description=long_description,
     #long_description_content_type="text/markdown",
     packages=setuptools.find_packages(),
+    #packages=['basic_file_ops','rwkos','txt_mixin'], 
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
