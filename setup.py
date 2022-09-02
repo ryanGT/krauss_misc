@@ -5,7 +5,7 @@ import setuptools
 
 setuptools.setup(
     name='krauss_misc',    # This is the name of your PyPI-package.
-    version='0.9.0',
+    version='0.9.1',
     url='https://github.com/ryanGT/krauss_misc',
     author='Ryan Krauss',
     author_email='ryanwkrauss@gmail.com',
