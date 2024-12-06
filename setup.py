@@ -5,7 +5,7 @@ import setuptools
 
 setuptools.setup(
     name='krauss_misc',    # This is the name of your PyPI-package.
-    version='0.9.1',
+    version='0.9.6',
     url='https://github.com/ryanGT/krauss_misc',
     author='Ryan Krauss',
     author_email='ryanwkrauss@gmail.com',
@@ -13,7 +13,7 @@ setuptools.setup(
     #long_description=long_description,
     #long_description_content_type="text/markdown",
     packages=setuptools.find_packages(),
-    #packages=['basic_file_ops','rwkos','txt_mixin'], 
+    #packages=['basic_file_ops','rwkos','txt_mixin'],
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",

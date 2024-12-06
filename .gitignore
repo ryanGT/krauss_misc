@@ -1,2 +1,4 @@
 doc/
 __pycache__
+dist/
+krauss_misc.egg-info/
