@@ -19,6 +19,7 @@ mac_roots = {'345':'/Users/kraussry/345_F24_local', \
              '185_bad': '/Users/kraussry/Google Drive/185_template', \
              'general_teaching':'/Users/kraussry/general_teaching'}
 
+
 def find_class_folder(num):
     #/Users/kraussry/Work_vault_ios/445_prep/class_prep_445_545
 
@@ -66,16 +67,17 @@ def copy_figs_to_class_folder_figs(fn_list, class_num):
 
 
 
- 
 
-
+linux_roots = {'345':os.path.expanduser("~/345_F24_local")}
 
 
 def get_root(key):
     if os.path.exists('/mnt/chromeos/'):
         return chrome_roots[key]
-    else:
+    elif os.path.exists('/Users/kraussry/'):
         return mac_roots[key]
+    else:
+        return linux_roots[key]
 
 
 def amichrome():
