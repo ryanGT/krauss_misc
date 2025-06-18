@@ -1,6 +1,7 @@
 import os, copy, sys, glob, time, re
 import pdb
 import shutil
+import datetime
 #from IPython.core.debugger import Pdb
 
 date_pat = re.compile(r'(\d\d)_(\d\d)_(\d\d)/*$')
@@ -17,6 +18,58 @@ mac_roots = {'345':'/Users/kraussry/345_F24_local', \
              '185':'/Users/kraussry/185_template', \
              '185_bad': '/Users/kraussry/Google Drive/185_template', \
              'general_teaching':'/Users/kraussry/general_teaching'}
+
+def find_class_folder(num):
+    #/Users/kraussry/Work_vault_ios/445_prep/class_prep_445_545
+
+    # if it is May-July, assume we are talking about 445
+    now = datetime.datetime.now()
+    month = now.month
+
+    if month < 5:
+        folder = "/Users/kraussry/Work_vault_ios/450_prep"
+    elif 4 < month < 8:
+        folder = "/Users/kraussry/Work_vault_ios/445_prep/class_prep_445_545"
+    else:
+        folder = "/Users/kraussry/Work_vault_ios/345_prep/class_prep_345"
+
+
+    mypat = "class_%0.2i_*" % num
+    all_matches = glob_all_subdirs(folder, mypat)
+    matching_folders = [item for item in all_matches if os.path.isdir(item)]
+
+    if len(matching_folders) == 0:
+        print("did not find a match for %s under %s" % (mypat, folder))
+        return None
+    elif len(matching_folders) > 1:
+        print("found more than one match for %s under %s:" % (mypat, folder))
+        for item in matching_folders:
+            print("    %s" % item)
+
+        return None
+    else:
+        return matching_folders[0]
+
+
+def copy_figs_to_class_folder_figs(fn_list, class_num):
+    folder_path = find_class_folder(class_num)
+    assert folder_path is not None, "error, I can't go on"
+
+    fig_dir = os.path.join(folder_path, "figs")
+    make_dir(fig_dir)
+
+    for item in fn_list:
+        dst = os.path.join(fig_dir, item)
+        shutil.copyfile(item, dst)
+
+
+
+
+
+ 
+
+
+
 
 def get_root(key):
     if os.path.exists('/mnt/chromeos/'):
@@ -40,7 +93,7 @@ def copy_figs_to_obsidian(pat="*", dst_dir=default_figs_dir, \
     345_images.  Find the figures by using pat+ext as glob pattern."""
     myfigs = []
     for ext in ext_list:
-        glob_pat = pat + ext
+        glob_pat = pat + exe
         curlist = glob.glob(glob_pat)
         myfigs.extend(curlist)
 
@@ -501,6 +554,18 @@ def glob_all_subdirs(topdir, glob_pat, skipdirs=[]):
     #print('t3-t1='+str(t3-t1))
     #print('t2-t1='+str(t2-t1))
     return allmatches
+
+
+images_root_445 = "/Users/kraussry/Work_vault_ios/445_prep/class_prep_445_545/445_images/"
+
+def find_image_445(search_pat):
+    mylist = glob_all_subdirs(images_root_445, search_pat) 
+    if len(mylist) == 1:
+        myabs = mylist[0]
+        myrel = os.path.relpath(myabs, images_root_445)
+        return myrel
+    else:
+        return mylist
 
 
 def glob_search_walking_up(startdir, glob_pat):
